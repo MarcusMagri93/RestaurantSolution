@@ -9,8 +9,8 @@ namespace Restaurant.Service.Services
     public class BaseService<TEntity> : IBaseService<TEntity> where TEntity : IBaseEntity
     {
         // Injeção de Dependência dos Contratos
-        private readonly IBaseRepository<TEntity> _baseRepository;
-        private readonly IMapper _mapper;
+        protected readonly IBaseRepository<TEntity> _baseRepository;
+        protected readonly IMapper _mapper;
 
         // Construtor que recebe as dependências (AutoMapper e Repositório)
         public BaseService(IBaseRepository<TEntity> baseRepository, IMapper mapper)
