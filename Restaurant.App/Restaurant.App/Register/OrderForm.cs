@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
+using Restaurant.Domain.Interfaces.Base;
 using Restaurant.App.Base;
 using Restaurant.App.ViewModel;
 using Restaurant.Domain.Base;

@@ -1,25 +1,28 @@
 ﻿using AutoMapper;
+using FluentValidation; // NECESSÁRIO para registrar Validadores
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Restaurant.Domain.Base;
 using Restaurant.Domain.Entities;
 using Restaurant.Domain.Interfaces;
+using Restaurant.Domain.Interfaces.Base; // NECESSÁRIO para IBaseService, IOrderService, IProductService
 using Restaurant.Repository.Context;
-using Restaurant.Repository.Repositories.Base; // Adicionado para BaseRepository
+using Restaurant.Repository.Repositories;
+using Restaurant.Repository.Repositories.Base;
 using Restaurant.Services.Services;
-using Restaurant.Services.Services.Base; // Adicionado para BaseService
+using Restaurant.Services.Services.Base;
+using Restaurant.Services.Validators; // NECESSÁRIO para encontrar os Validadores
 using Restaurant.App.ViewModel;
-using System.IO; // Para File
-using System; // Para Console
+using System.IO;
+using System;
 
 namespace Restaurant.App.Infra
 {
-    // Classe de Extensão DEVE ser estática
     public static class ConfigureDI
     {
-        // CORREÇÃO: Método de extensão! O nome deve ser ConfigureDI e deve ter 'this IServiceCollection services'
-        public static IServiceCollection ConfigureDI(this IServiceCollection services)
+        // CORREÇÃO 1: O método foi renomeado para evitar conflito de nomes
+        public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services)
         {
             // data base config (Mantendo a lógica de leitura do seu arquivo)
             var dbConfigFile = "Config/DbConfig.txt";
@@ -32,50 +35,48 @@ namespace Restaurant.App.Infra
                 options =>
                 {
                     options.LogTo(Console.WriteLine);
-                    // Aqui você pode precisar de um using para o driver MySQL (ex: MySql.EntityFrameworkCore)
                     options.UseMySQL(strCon);
                 }
             );
 
-            #region Repository
-            // Registros de Repositórios (IBaseRepository)
-            // Estes registros não são mais necessários se você usou services.AddScoped(typeof(IBaseRepository<>)...
-            /*
-            services.AddScoped<IBaseRepository<Product>, BaseRepository<Product>>();
-            services.AddScoped<IBaseRepository<Drink>, BaseRepository<Drink>>();
-            services.AddScoped<IBaseRepository<Food>, BaseRepository<Food>>();
-            services.AddScoped<IBaseRepository<Order>, BaseRepository<Order>>();
-            services.AddScoped<IBaseRepository<OrderItem>, BaseRepository<OrderItem>>();
-            services.AddScoped<IBaseRepository<Waiter>, BaseRepository<Waiter>>();
-            */
-            #endregion
+            // ----------------------------------------------------
+            // 1. REPOSITÓRIOS (Genéricos)
+            // ----------------------------------------------------
+            // services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>)); // Já registrado acima
 
-            #region Service
-            // Serviços genéricos (IBaseService -> BaseService)
+            // ----------------------------------------------------
+            // 2. SERVICES (Genéricos e Específicos)
+            // ----------------------------------------------------
             services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
-            // Serviços Específicos
-            services.AddScoped<IOrderService, OrderService>();
-            // services.AddScoped<IProductService, ProductService>(); // Removido IProductService pois ele não existe no pattern original
-            #endregion
 
-            // Configuração do AutoMapper
+            // CORREÇÃO 3: Os tipos agora devem ser reconhecidos (usando Restaurant.Domain.Interfaces.Base;)
+            // E Service/Implementation estão em Restaurant.Domain.Interfaces.Base/Restaurant.Services.Services
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IProductService, ProductService>(); // Inclusão do ProductService (que precisa do IProductService)
+
+            // ----------------------------------------------------
+            // 3. VALIDATORS (Agora registrado com a classe base AbstractValidator<TEntity>)
+            // ----------------------------------------------------
+            services.AddScoped<AbstractValidator<Food>, FoodValidator>();
+            services.AddScoped<AbstractValidator<Waiter>, WaiterValidator>();
+            services.AddScoped<AbstractValidator<Order>, OrderValidator>();
+            // Adicione os validadores para Drink e Product/Food aqui, se necessário.
+
+            // ----------------------------------------------------
+            // 4. AUTOMAPPER
+            // ----------------------------------------------------
             services.AddSingleton(
                 new MapperConfiguration(
                     config => {
-                        // Mapeamentos Entidade -> ViewModel
                         config.CreateMap<Product, ProductViewModel>().ReverseMap();
-                        config.CreateMap<Drink, DrinkViewModel>().ReverseMap(); // Se DrinkViewModel existir
-                        config.CreateMap<Food, FoodViewModel>().ReverseMap();   // Se FoodViewModel existir
+                        config.CreateMap<Drink, DrinkViewModel>().ReverseMap();
+                        config.CreateMap<Food, FoodViewModel>().ReverseMap();
                         config.CreateMap<Order, OrderViewModel>().ReverseMap();
-                        config.CreateMap<OrderItem, OrderItemViewModel>().ReverseMap(); // Se OrderItemViewModel existir
+                        config.CreateMap<OrderItem, OrderItemViewModel>().ReverseMap();
                         config.CreateMap<Waiter, WaiterViewModel>().ReverseMap();
-
                     },
                     NullLoggerFactory.Instance).CreateMapper()
                 );
-
-            // Você precisará adicionar os registradores de Validadores FluentValidation aqui
-            // services.AddScoped<IValidator<Food>, FoodValidator>(); etc.
 
             return services;
         }

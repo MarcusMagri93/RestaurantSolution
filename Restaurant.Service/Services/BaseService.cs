@@ -12,8 +12,8 @@ namespace Restaurant.Services.Services.Base
         where TEntity : BaseEntity<int> // <--- RESTRIÇÃO ESSENCIAL
     {
         // Nota: IBaseRepository está no namespace Restaurant.Domain.Base
-        private readonly IBaseRepository<TEntity> _repository;
-        private readonly IMapper _mapper;
+        protected readonly IBaseRepository<TEntity> _repository;
+        protected readonly IMapper _mapper;
 
         // O construtor injeta o Repositório e o AutoMapper
         public BaseService(IBaseRepository<TEntity> repository, IMapper mapper)

@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Restaurant.App.Infra; // Onde ConfigureDI está
-using Restaurant.App.Others;
-using Restaurant.App.Register;
+using Restaurant.App.Infra;
 using System;
 using System.Windows.Forms;
+using Restaurant.App.Others;
+using Restaurant.App.Register;
 
 namespace Restaurant.App
 {
@@ -36,21 +36,19 @@ namespace Restaurant.App
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            // Adiciona serviços de DI do projeto (Entities, Services, Repositories, etc.)
-            services.ConfigureDI();
+            // CORRIGIDO: Chamando o novo nome do método de extensão
+            services.ConfigureApplicationServices();
 
             // Registra Formulários (Views) - DI
 
-            // Singleton: O formulário principal deve ser Singleton, pois só existe uma instância dele
+            // Singleton: O formulário principal (Menu)
             services.AddSingleton<MainForm>();
 
-            // Transient: Formulários que podem ser abertos várias vezes (ou um de cada vez)
+            // Transient: Formulários de CRUD e Login
             services.AddTransient<LoginForm>();
             services.AddTransient<RegisterWaiterForm>();
             services.AddTransient<ProductForm>();
             services.AddTransient<OrderForm>();
-
-            // OBS: Adicione aqui qualquer outro formulário ou serviço que você precise registrar
         }
     }
 }

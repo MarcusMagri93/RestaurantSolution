@@ -1,15 +1,11 @@
 ﻿using Restaurant.Domain.Entities;
 using System.Collections.Generic;
+using Restaurant.Domain.Base; 
 
 namespace Restaurant.Domain.Interfaces
 {
-    // Esta interface define os casos de uso para a entidade Product
-    public interface IProductService
+    public interface IProductService : IBaseService<Product>
     {
-        void Insert(Product product);
-        void Update(Product product);
-        void Delete(int id);
-        Product GetById(int id);
-        IList<Product> GetAll();
+        
     }
 }
