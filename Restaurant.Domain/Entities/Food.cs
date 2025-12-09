@@ -5,23 +5,22 @@
         public double Weight { get; set; }
         public string Ingredients { get; set; }
 
-        // Construtor Vazio (Padrão do Professor)
         public Food()
         {
             Ingredients = string.Empty;
         }
 
-        // Construtor para Criação
+        // Construtor para Criação (Chama construtor base Product(name, price))
         public Food(string name, double price, double weight, string ingredients)
-            : base(name, price) // Chama o construtor de Product
+            : base(name, price)
         {
             Weight = weight;
             Ingredients = ingredients;
         }
 
-        // Construtor Completo com Id
+        // Construtor Completo com Id (Chama construtor base Product(id, name, price))
         public Food(int id, string name, double price, double weight, string ingredients)
-            : base(id, name, price) // Chama o construtor de Product com Id
+            : base(id, name, price)
         {
             Weight = weight;
             Ingredients = ingredients;

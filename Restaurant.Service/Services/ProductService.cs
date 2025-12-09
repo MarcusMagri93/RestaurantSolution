@@ -4,7 +4,7 @@ using Restaurant.Domain.Base;
 using Restaurant.Domain.Entities;
 using Restaurant.Domain.Interfaces;
 
-namespace Restaurant.Service.Services
+namespace Restaurant.Services.Services
 {
     public class ProductService : BaseService<Product>, IProductService // <-- Adicione ', IProductService'
     {

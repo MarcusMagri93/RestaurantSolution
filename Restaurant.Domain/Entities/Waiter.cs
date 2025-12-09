@@ -1,29 +1,28 @@
 ﻿using Restaurant.Domain.Base;
+using System.Collections.Generic;
 
 namespace Restaurant.Domain.Entities
 {
     public class Waiter : BaseEntity<int>
     {
-        public string Name { get; set; } = string.Empty;
-        public string Registration { get; set; } = string.Empty; // Matrícula ou código de acesso
+        public string Name { get; set; } = default!;
+        public string Registration { get; set; } = default!; // Matrícula ou código de acesso
+        public string Password { get; set; } = default!; // Propriedade já inicializada
 
-        // Construtor Vazio (Padrão do Professor)
+        public ICollection<Order> Orders { get; set; }
+
         public Waiter()
         {
+            Orders = new List<Order>();
         }
 
-        // Construtor para Criação
-        public Waiter(string name, string registration)
+        // CONSTRUTOR CORRIGIDO: Adiciona o parâmetro 'password' e o inicializa
+        public Waiter(string name, string registration, string password)
         {
             Name = name;
             Registration = registration;
-        }
-
-        // Construtor Completo com Id (para Carregamento)
-        public Waiter(int id, string name, string registration) : base(id)
-        {
-            Name = name;
-            Registration = registration;
+            Password = password; 
+            Orders = new List<Order>();
         }
     }
 }

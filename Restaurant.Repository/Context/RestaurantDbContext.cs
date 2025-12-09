@@ -1,45 +1,50 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.Domain.Entities;
+using System.Reflection; // Necessário para ApplyConfigurationsFromAssembly
 
 namespace Restaurant.Repository.Context
 {
     public class RestaurantDbContext : DbContext
     {
-        // Construtor que o EF Core usará para configurar a conexão.
+        // Construtor Vazio (Necessário para a Migração)
+        public RestaurantDbContext()
+        {
+        }
+
         public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options)
             : base(options)
         {
         }
 
-        // DbSets: Mapeiam as Entidades de Domínio para as Tabelas do Banco de Dados
+        // DbSets
         public DbSet<Product> Products { get; set; }
         public DbSet<Waiter> Waiters { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
 
-        // Mapeamento e Regras de Relacionamento (Fluent API)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                // Configuração MySQL usando a biblioteca Pomelo ou MySql.EntityFrameworkCore
+                const string connectionString = "server=localhost;port=3306;database=RestaurantDB;user=root;password="; // Senha vazia
+
+                // Opção 1: Se estiver usando Pomelo
+                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+
+                // Opção 2: Se estiver usando MySql.EntityFrameworkCore (usado anteriormente)
+                // optionsBuilder.UseMySQL(connectionString); 
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // 1. Configuração para Herança de Produtos (Table Per Hierarchy - TPH)
-            // Mapeia Food e Drink para a tabela Products, usando a coluna 'ProductType'.
-            modelBuilder.Entity<Product>()
-                .HasDiscriminator<string>("ProductType")
-                .HasValue<Food>("Food")
-                .HasValue<Drink>("Drink");
+            // CORREÇÃO: Aplica TODOS os mapeamentos da pasta Mapping de uma só vez (Padrão PetShop)
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-            // 2. Relacionamento (Order 1:N OrderItem)
-            modelBuilder.Entity<Order>()
-                .HasMany(o => o.Items)
-                .WithOne(oi => oi.Order)
-                .HasForeignKey("OrderId");
-
-            // 3. Relacionamento (Waiter 1:N Order)
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Waiter)
-                .WithMany() // Relação 1:N (um Garçom para muitos Pedidos)
-                .HasForeignKey(o => o.WaiterId);
+            // OBS: O TPH (Herança de Produtos) já está no ProductMap.cs e será aplicado automaticamente.
         }
     }
 }

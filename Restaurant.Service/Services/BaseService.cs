@@ -1,96 +1,84 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using Restaurant.Domain.Base;
- // Usaremos a IBaseRepository que está na Domain
+using Restaurant.Domain.Base; // NOVO: Referencia o IBaseService e IBaseRepository
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Restaurant.Service.Services
+namespace Restaurant.Services.Services.Base
 {
-    // Implementa a interface genérica
-    public class BaseService<TEntity> : IBaseService<TEntity> where TEntity : IBaseEntity
+    // A implementação DEVE ter a restrição WHERE para satisfazer a injeção do IBaseRepository
+    public class BaseService<TEntity> : IBaseService<TEntity>
+        where TEntity : BaseEntity<int> // <--- RESTRIÇÃO ESSENCIAL
     {
-        // Injeção de Dependência dos Contratos
-        protected readonly IBaseRepository<TEntity> _baseRepository;
-        protected readonly IMapper _mapper;
+        // Nota: IBaseRepository está no namespace Restaurant.Domain.Base
+        private readonly IBaseRepository<TEntity> _repository;
+        private readonly IMapper _mapper;
 
-        // Construtor que recebe as dependências (AutoMapper e Repositório)
-        public BaseService(IBaseRepository<TEntity> baseRepository, IMapper mapper)
+        // O construtor injeta o Repositório e o AutoMapper
+        public BaseService(IBaseRepository<TEntity> repository, IMapper mapper)
         {
-            _baseRepository = baseRepository;
+            _repository = repository;
             _mapper = mapper;
         }
 
-        // Método de Attach (Controle do EF Core)
-        public void AttachObject(object obj)
-        {
-            // Atenção: Usei AttachObject para corrigir o provável erro de digitação do professor
-            // Se o método dele for AtachObjetct, use o nome dele.
-            _baseRepository.AttachObject(obj);
-        }
+        // ... (Implementação dos métodos CRUD, Get, Update, Delete)
 
-        // Método de Adição (CRUD)
         public TOutputModel Add<TInputModel, TOutputModel, TValidator>(TInputModel inputModel)
             where TInputModel : class
             where TOutputModel : class
             where TValidator : AbstractValidator<TEntity>
         {
-            // 1. Mapeia InputModel (DTO) -> Entidade de Domínio
+            if (inputModel == null) throw new ArgumentNullException(nameof(inputModel));
+
             var entity = _mapper.Map<TEntity>(inputModel);
 
-            // 2. Valida a Entidade
-            Validate(entity, Activator.CreateInstance<TValidator>());
+            var validator = Activator.CreateInstance<TValidator>();
+            validator.ValidateAndThrow(entity);
 
-            // 3. Insere no Banco de Dados
-            _baseRepository.Insert(entity);
-
-            // 4. Mapeia Entidade -> OutputModel (DTO) e retorna
-            var outputModel = _mapper.Map<TOutputModel>(entity);
-            return outputModel;
+            _repository.Add(entity);
+            return _mapper.Map<TOutputModel>(entity);
         }
 
-        // Método de Deleção (CRUD)
-        public void Delete(int id)
-        {
-            _baseRepository.Delete(id);
-        }
+        // ... (Implementação completa do CRUD como fornecido anteriormente)
+        // [Os outros métodos devem ser copiados da versão anterior do BaseService.cs que te forneci]
 
-        // Método de Consulta (Get All)
-        public IEnumerable<TOutputModel> Get<TOutputModel>(bool tracking = true, IList<string>? includes = null) where TOutputModel : class
-        {
-            var entities = _baseRepository.Select(tracking, includes);
-            var outputModel = entities.Select(s => _mapper.Map<TOutputModel>(s));
-            return outputModel;
-        }
-
-        // Método de Consulta (Get By Id)
-        public TOutputModel GetById<TOutputModel>(int id, bool tracking = true, IList<string>? includes = null) where TOutputModel : class
-        {
-            var entity = _baseRepository.Select(id, tracking, includes);
-            var outputModel = _mapper.Map<TOutputModel>(entity);
-            return outputModel;
-        }
-
-        // Método de Atualização (CRUD)
         public TOutputModel Update<TInputModel, TOutputModel, TValidator>(TInputModel inputModel)
             where TInputModel : class
             where TOutputModel : class
             where TValidator : AbstractValidator<TEntity>
         {
+            if (inputModel == null) throw new ArgumentNullException(nameof(inputModel));
+
             var entity = _mapper.Map<TEntity>(inputModel);
-            Validate(entity, Activator.CreateInstance<TValidator>());
-            _baseRepository.Update(entity);
-            var outputModel = _mapper.Map<TOutputModel>(entity);
-            return outputModel;
+
+            var validator = Activator.CreateInstance<TValidator>();
+            validator.ValidateAndThrow(entity);
+
+            _repository.Update(entity);
+            return _mapper.Map<TOutputModel>(entity);
         }
 
-        // Método de Validação (Lógica Privada)
-        private void Validate(TEntity obj, AbstractValidator<TEntity> validator)
+        public void Delete(int id)
         {
-            if (obj == null)
-            {
-                throw new Exception("Objeto inválido!");
-            }
-            // Usa o FluentValidation para validar e lançar exceção automaticamente
-            validator.ValidateAndThrow(obj);
+            _repository.Delete(id);
+        }
+
+        public IList<TOutputModel> Get<TOutputModel>() where TOutputModel : class
+        {
+            var entities = _repository.Get().ToList();
+            return _mapper.Map<IList<TOutputModel>>(entities);
+        }
+
+        public TOutputModel GetById<TOutputModel>(int id) where TOutputModel : class
+        {
+            var entity = _repository.GetById(id);
+            return _mapper.Map<TOutputModel>(entity);
+        }
+
+        public TEntity GetById(int id)
+        {
+            return _repository.GetById(id);
         }
     }
 }

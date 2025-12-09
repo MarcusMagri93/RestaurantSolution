@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
-using Restaurant.Domain.Base;
 using System.Collections.Generic;
 
-namespace Restaurant.Domain.Base
+namespace Restaurant.Domain.Base // <-- Namespace confirmado pelo seu print
 {
-    // A interface define o contrato genérico para todos os serviços.
-    public interface IBaseService<TEntity> where TEntity : IBaseEntity
+    // A interface IBaseService DEVE ter a mesma restrição de entidade
+    public interface IBaseService<TEntity>
+        where TEntity : BaseEntity<int> // <--- RESTRIÇÃO ESSENCIAL
     {
-        // CRUD Genérico (usando Generics para DTOs e Validators)
+        // Métodos CRUD (usando ViewModels para entrada/saída)
         TOutputModel Add<TInputModel, TOutputModel, TValidator>(TInputModel inputModel)
             where TInputModel : class
             where TOutputModel : class
@@ -20,11 +20,10 @@ namespace Restaurant.Domain.Base
 
         void Delete(int id);
 
-        // Consultas Genéricas
-        TOutputModel GetById<TOutputModel>(int id, bool tracking = true, IList<string>? includes = null) where TOutputModel : class;
-        IEnumerable<TOutputModel> Get<TOutputModel>(bool tracking = true, IList<string>? includes = null) where TOutputModel : class;
+        // Métodos de Consulta
+        IList<TOutputModel> Get<TOutputModel>() where TOutputModel : class;
+        TOutputModel GetById<TOutputModel>(int id) where TOutputModel : class;
 
-        // Métodos de Controle do Repositório (EF Core)
-        void AttachObject(object obj);
+        TEntity GetById(int id); // Para uso interno
     }
 }

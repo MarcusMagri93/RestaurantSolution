@@ -1,22 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using Restaurant.Domain.Base; // O namespace da sua entidade base
 
+// Namespace CORRETO para o seu IBaseRepository
 namespace Restaurant.Domain.Base
 {
-    // Generics: <TEntity> define que esta interface pode funcionar com qualquer Entidade.
-    // where TEntity : IBaseEntity: Restrição para garantir que TEntity é uma classe de domínio.
-    public interface IBaseRepository<TEntity> where TEntity : IBaseEntity
+    public interface IBaseRepository<TEntity> where TEntity : BaseEntity<int>
     {
-        // Métodos de Controle do Entity Framework Core
-        void ClearChangeTracker();
-        void AttachObject(object obj); // Renomeei AtachObjectct para AttachObject (corrigindo um provável erro de digitação)
+        void Add(TEntity obj);
+        void Update(TEntity obj);
+        void Delete(int id);
 
-        // Métodos de Inserção, Atualização e Deleção (CRUD)
-        void Insert(TEntity entity);
-        void Update(TEntity entity);
-        void Delete(object id);
-
-        // Métodos de Seleção (Consulta)
-        IList<TEntity> Select(bool tracking = true, IList<string>? includes = null);
-        TEntity Select(object id, bool tracking = true, IList<string>? includes = null);
+        IQueryable<TEntity> Get();
+        TEntity GetById(int id);
     }
 }
