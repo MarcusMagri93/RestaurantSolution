@@ -32,8 +32,6 @@ namespace Restaurant.Repository.Context
                 // Opção 1: Se estiver usando Pomelo
                 optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 
-                // Opção 2: Se estiver usando MySql.EntityFrameworkCore (usado anteriormente)
-                // optionsBuilder.UseMySQL(connectionString); 
             }
         }
 
@@ -44,7 +42,26 @@ namespace Restaurant.Repository.Context
             // CORREÇÃO: Aplica TODOS os mapeamentos da pasta Mapping de uma só vez (Padrão PetShop)
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-            // OBS: O TPH (Herança de Produtos) já está no ProductMap.cs e será aplicado automaticamente.
+            modelBuilder.Entity<Waiter>()
+        .Property(w => w.Id)
+        .ValueGeneratedOnAdd(); // Diz ao EF Core que o ID é gerado pelo banco (auto-increment)
+
+            // 2. CONFIGURAÇÃO DE CAMPOS OBRIGATÓRIOS
+            modelBuilder.Entity<Waiter>()
+                .Property(w => w.Name).IsRequired().HasMaxLength(100);
+
+            modelBuilder.Entity<Waiter>()
+                .Property(w => w.Registration).IsRequired().HasMaxLength(50);
+
+            modelBuilder.Entity<Waiter>()
+                .Property(w => w.Password).IsRequired().HasMaxLength(50);
+
+            // 3. RELAÇÃO (Para evitar erros futuros se a tabela Orders estiver faltando)
+            modelBuilder.Entity<Waiter>()
+                .HasMany(w => w.Orders)
+                .WithOne(o => o.Waiter)
+                .HasForeignKey(o => o.WaiterId);
+
         }
     }
 }

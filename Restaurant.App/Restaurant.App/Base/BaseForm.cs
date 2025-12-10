@@ -9,6 +9,7 @@ namespace Restaurant.App.Base // Certifique-se que o namespace está correto
     {
         #region Declarações
         protected bool IsAlteracao = false;
+
         #endregion
 
         #region Construtor

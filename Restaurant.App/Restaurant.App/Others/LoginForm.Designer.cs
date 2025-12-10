@@ -14,6 +14,7 @@ namespace Restaurant.App.Others
         protected MaterialButton btnLogin;
         protected MaterialLabel lblRegistration;
         protected MaterialLabel lblPassword;
+        protected MaterialButton btnRegister; // <--- NOVO: Botão de Cadastro
 
         protected override void Dispose(bool disposing)
         {
@@ -33,6 +34,7 @@ namespace Restaurant.App.Others
             this.btnLogin = new ReaLTaiizor.Controls.MaterialButton();
             this.lblRegistration = new ReaLTaiizor.Controls.MaterialLabel();
             this.lblPassword = new ReaLTaiizor.Controls.MaterialLabel();
+            this.btnRegister = new ReaLTaiizor.Controls.MaterialButton(); // <--- NOVO: Inicialização
 
             this.SuspendLayout();
 
@@ -67,19 +69,32 @@ namespace Restaurant.App.Others
             // 
             this.txtPassword.Location = new System.Drawing.Point(50, 205);
             this.txtPassword.Size = new System.Drawing.Size(300, 36);
-            this.txtPassword.PasswordChar = '●'; // Esconde a senha
+            this.txtPassword.PasswordChar = '●';
             this.txtPassword.Name = "txtPassword";
             this.Controls.Add(this.txtPassword);
 
             // 
             // btnLogin
             // 
-            this.btnLogin.Text = "Entrar";
+            this.btnLogin.Text = "ENTRAR";
+            // Reposicionado à direita: (350 - 100) = 250
             this.btnLogin.Location = new System.Drawing.Point(250, 270);
             this.btnLogin.Size = new System.Drawing.Size(100, 40);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Click += new System.EventHandler(this.LoginButton_Click);
             this.Controls.Add(this.btnLogin);
+
+            // 
+            // btnRegister // <--- NOVO BOTÃO DE CADASTRO
+            // 
+            this.btnRegister.Text = "CADASTRAR";
+            // Posicionado à esquerda de ENTAR: 250 - 120 = 130
+            this.btnRegister.Location = new System.Drawing.Point(130, 270);
+            this.btnRegister.Size = new System.Drawing.Size(110, 40);
+            this.btnRegister.Name = "btnRegister";
+            // Adicionado o EventHandler que abriremos no LoginForm.cs
+            this.btnRegister.Click += new System.EventHandler(this.btnRegister_Click);
+            this.Controls.Add(this.btnRegister);
 
             // 
             // LoginForm (MaterialForm)

@@ -16,8 +16,14 @@ namespace Restaurant.Services.Validators
                 .NotEmpty().WithMessage("O número de registro é obrigatório.");
 
 
-            RuleFor(c => c.Orders)
-                .NotNull().WithMessage("A lista de pedidos não pode ser nula.");
+            RuleFor(p => p.Password)
+                .NotEmpty().WithMessage("Sua senha não poder ser vazia")
+                .MinimumLength(8).WithMessage("Sua senha deve ter no mínimo 8 caracteres.")
+                .MaximumLength(16).WithMessage("Sua senha deve ter no máximo 16 caracteres.")
+                .Matches(@"[A-Z]+").WithMessage("Sua senha deve conter pelo menos uma letra maiúscula.")
+                .Matches(@"[a-z]+").WithMessage("Sua senha deve conter pelo menos uma letra minúscula.")
+                .Matches(@"[0-9]+").WithMessage("Sua senha deve conter pelo menos um número.")
+                .Matches(@"[\!\?\*\.\@]+").WithMessage("Sua senha deve conter pelo menos um caractere especial (! ? * .).");
         }
     }
 }
