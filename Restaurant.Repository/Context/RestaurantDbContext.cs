@@ -1,66 +1,39 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.Domain.Entities;
+using Restaurant.Repository.Mapping;
 using System.Reflection; // Necessário para ApplyConfigurationsFromAssembly
 
 namespace Restaurant.Repository.Context
 {
     public class RestaurantDbContext : DbContext
     {
-        // Construtor Vazio (Necessário para a Migração)
-        public RestaurantDbContext()
+        public RestaurantDbContext(DbContextOptions<RestaurantDbContext>? options = null) :
+           base(options)
         {
+            Database.EnsureCreated();
         }
-
-        public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options)
-            : base(options)
-        {
-        }
-
-        // DbSets
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Waiter> Waiters { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                // Configuração MySQL usando a biblioteca Pomelo ou MySql.EntityFrameworkCore
-                const string connectionString = "server=localhost;port=3306;database=RestaurantDB;user=root;password="; // Senha vazia
-
-                // Opção 1: Se estiver usando Pomelo
-                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-
-            }
+            optionsBuilder.UseMySQL("server=localhost;port=3306;database=RestaurantDB;user=root;password=");
         }
+        public DbSet<Drink> Drink { get; set; }
+        public DbSet<Food> Food { get; set; }
+        public DbSet<Order> Order { get; set; }
+        public DbSet<OrderItem> OrderItem { get; set; }
+        public DbSet<Product> Product { get; set; }
+        public DbSet<Waiter> Waiter { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // CORREÇÃO: Aplica TODOS os mapeamentos da pasta Mapping de uma só vez (Padrão PetShop)
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-            modelBuilder.Entity<Waiter>()
-        .Property(w => w.Id)
-        .ValueGeneratedOnAdd(); // Diz ao EF Core que o ID é gerado pelo banco (auto-increment)
-
-            // 2. CONFIGURAÇÃO DE CAMPOS OBRIGATÓRIOS
-            modelBuilder.Entity<Waiter>()
-                .Property(w => w.Name).IsRequired().HasMaxLength(100);
-
-            modelBuilder.Entity<Waiter>()
-                .Property(w => w.Registration).IsRequired().HasMaxLength(50);
-
-            modelBuilder.Entity<Waiter>()
-                .Property(w => w.Password).IsRequired().HasMaxLength(50);
-
-            // 3. RELAÇÃO (Para evitar erros futuros se a tabela Orders estiver faltando)
-            modelBuilder.Entity<Waiter>()
-                .HasMany(w => w.Orders)
-                .WithOne(o => o.Waiter)
-                .HasForeignKey(o => o.WaiterId);
+            modelBuilder.Entity<Drink>(new DrinkMap().Configure);
+            modelBuilder.Entity<Food>(new FoodMap().Configure);
+            modelBuilder.Entity<OrderItem>(new OrderItemMap().Configure);
+            modelBuilder.Entity<Order>(new OrderMap().Configure);
+            modelBuilder.Entity<Product>(new ProductMap().Configure);
+            modelBuilder.Entity<Waiter>(new WaiterMap().Configure);
 
         }
     }

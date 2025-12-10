@@ -24,7 +24,7 @@ namespace Restaurant.Repository.Mapping
             // Configuração da Herança (TPH)
             builder.HasDiscriminator<string>("ProductType")
                 .HasValue<Food>("Food")
-                .HasValue<Drink>("Drink");
+                .HasValue<DrinkMap>("Drink");
         }
     }
 }
