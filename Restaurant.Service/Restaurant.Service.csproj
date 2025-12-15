@@ -1,28 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Services\MappingProfiles\**" />
-    <EmbeddedResource Remove="Services\MappingProfiles\**" />
-    <None Remove="Services\MappingProfiles\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Services\MappingProfiles\**" />
+		<EmbeddedResource Remove="Services\MappingProfiles\**" />
+		<None Remove="Services\MappingProfiles\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="MappingProfiles\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="MappingProfiles\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="15.1.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="13.0.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Restaurant.Domain\Restaurant.Domain.csproj" />
-    <ProjectReference Include="..\Restaurant.Repository\Restaurant.Repository.csproj" /> 
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Restaurant.Domain\Restaurant.Domain.csproj" />
+		<ProjectReference Include="..\Restaurant.Repository\Restaurant.Repository.csproj" />
+	</ItemGroup>
 
 </Project>

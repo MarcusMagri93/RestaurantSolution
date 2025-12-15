@@ -16,7 +16,7 @@ using Restaurant.Services.Validators;
 using Restaurant.App.ViewModel;
 using System.IO;
 using System;
-using System.Linq; // Necessário para o Select
+using System.Linq;
 
 namespace Restaurant.App.Infra
 {
@@ -25,7 +25,6 @@ namespace Restaurant.App.Infra
         public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services)
         {
             var dbConfigFile = "Config/DbConfig.txt";
-            // Verifica se arquivo existe para evitar crash em tempo de design/execução inicial
             var strCon = File.Exists(dbConfigFile) ? File.ReadAllText(dbConfigFile) : "";
 
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
@@ -48,33 +47,36 @@ namespace Restaurant.App.Infra
             services.AddScoped<AbstractValidator<Order>, OrderValidator>();
             services.AddScoped<AbstractValidator<Drink>, DrinkValidator>();
 
-            // Configuração do AutoMapper com as melhorias
+            // --- CORREÇÃO DO ERRO E DO MAPEAMENTO ---
             services.AddSingleton(
-                new MapperConfiguration(
-                    config => {
-                        // Mapeamento Etapa 1: Define o 'Type' baseado na classe
-                        config.CreateMap<Product, ProductViewModel>()
-                              .ForMember(dest => dest.Type, opt => opt.MapFrom(src =>
-                                  src is Food ? "Comida" :
-                                  src is Drink ? "Bebida" : "Outro"))
-                              .ReverseMap();
+                new MapperConfiguration(config => {
+                    // 1. Mapeamento Pai: Product -> ProductViewModel
+                    config.CreateMap<Product, ProductViewModel>()
+                          .ForMember(dest => dest.Type, opt => opt.MapFrom(src =>
+                              src is Food ? "Comida" :
+                              src is Drink ? "Bebida" : "Outro"))
+                          .ReverseMap();
 
-                        config.CreateMap<Drink, DrinkViewModel>().ReverseMap();
-                        config.CreateMap<Food, FoodViewModel>().ReverseMap();
+                    // 2. CORREÇÃO CRUCIAL: Diz ao AutoMapper que Food e Drink usam a regra de ProductViewModel
+                    config.CreateMap<Food, ProductViewModel>().IncludeBase<Product, ProductViewModel>();
+                    config.CreateMap<Drink, ProductViewModel>().IncludeBase<Product, ProductViewModel>();
 
-                        // Mapeamento Etapa 2: Cria o resumo de produtos para a grade
-                        config.CreateMap<Order, OrderViewModel>()
-                              .ForMember(dest => dest.ProductsSummary, opt => opt.MapFrom(src =>
-                                  src.OrderItems != null
-                                  ? string.Join(", ", src.OrderItems.Select(i => $"{i.Product.Name} (x{i.Quantity})"))
-                                  : string.Empty))
-                              .ReverseMap();
+                    // 3. Mapeamentos Específicos
+                    config.CreateMap<Drink, DrinkViewModel>().ReverseMap();
+                    config.CreateMap<Food, FoodViewModel>().ReverseMap();
 
-                        config.CreateMap<OrderItem, OrderItemViewModel>().ReverseMap();
-                        config.CreateMap<Waiter, WaiterViewModel>().ReverseMap();
-                    },
-                    NullLoggerFactory.Instance).CreateMapper()
-                );
+                    // 4. Mapeamento de Pedidos com Resumo
+                    config.CreateMap<Order, OrderViewModel>()
+                          .ForMember(dest => dest.ProductsSummary, opt => opt.MapFrom(src =>
+                              src.OrderItems != null && src.OrderItems.Any()
+                              ? string.Join(", ", src.OrderItems.Select(i => $"{i.Product.Name} (x{i.Quantity})"))
+                              : ""))
+                          .ReverseMap();
+
+                    config.CreateMap<OrderItem, OrderItemViewModel>().ReverseMap();
+                    config.CreateMap<Waiter, WaiterViewModel>().ReverseMap();
+                }).CreateMapper() // <--- AQUI ESTAVA O ERRO (removido o NullLoggerFactory)
+            );
 
             return services;
         }

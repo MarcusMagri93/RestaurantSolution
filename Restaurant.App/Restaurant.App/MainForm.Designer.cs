@@ -7,8 +7,9 @@ namespace Restaurant.App
     {
         private System.ComponentModel.IContainer components = null;
 
-        // Componentes mínimos de menu para a aplicação
+        // Componentes do menu
         protected MaterialButton btnMenuProduct;
+        protected MaterialButton btnMenuListProducts; // <--- NOVO BOTÃO
         protected MaterialButton btnMenuWaiter;
         protected MaterialButton btnMenuOrder;
 
@@ -26,19 +27,30 @@ namespace Restaurant.App
         private void InitializeComponent()
         {
             this.btnMenuProduct = new ReaLTaiizor.Controls.MaterialButton();
+            this.btnMenuListProducts = new ReaLTaiizor.Controls.MaterialButton();
             this.btnMenuWaiter = new ReaLTaiizor.Controls.MaterialButton();
             this.btnMenuOrder = new ReaLTaiizor.Controls.MaterialButton();
 
             this.SuspendLayout();
 
             // 
-            // btnMenuProduct
+            // btnMenuProduct (Cadastrar)
             // 
             this.btnMenuProduct.Text = "Cadastrar Produtos";
             this.btnMenuProduct.Location = new Point(20, 100);
             this.btnMenuProduct.Size = new Size(200, 40);
             this.btnMenuProduct.Click += new System.EventHandler(this.MenuProduct_Click);
             this.Controls.Add(this.btnMenuProduct);
+
+            // 
+            // btnMenuListProducts (Listar) - NOVO
+            // 
+            this.btnMenuListProducts.Text = "Listar Produtos";
+            // Posicionado ao lado do cadastro (20 + 200 + 20 de margem = 240)
+            this.btnMenuListProducts.Location = new Point(240, 100);
+            this.btnMenuListProducts.Size = new Size(200, 40);
+            this.btnMenuListProducts.Click += new System.EventHandler(this.MenuListProducts_Click);
+            this.Controls.Add(this.btnMenuListProducts);
 
             // 
             // btnMenuWaiter

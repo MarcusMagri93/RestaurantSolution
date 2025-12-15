@@ -16,6 +16,9 @@ namespace Restaurant.App.Register
         private readonly IBaseService<Food> _foodService;
         private readonly IBaseService<Drink> _drinkService;
 
+        // Propriedade para controlar qual aba abrir (0 = Cadastro, 1 = Consulta)
+        public int TabIndexInicial { get; set; } = 0;
+
         public ProductForm(
             IBaseService<Product> productService,
             IBaseService<Food> foodService,
@@ -52,19 +55,26 @@ namespace Restaurant.App.Register
             base.OnVisibleChanged(e);
             if (this.Visible)
             {
-                this.tabControlCadastro.SelectedIndex = 0;
-                LimpaCampos();
-                IsAlteracao = false;
-                radFood.Checked = true;
+                // Usa a propriedade definida pelo Menu Principal para escolher a aba
+                this.tabControlCadastro.SelectedIndex = TabIndexInicial;
 
-                // Força o carregamento da grid para garantir que as colunas novas apareçam
-                CarregaGrid();
+                // Se for cadastro, limpa tudo. Se for consulta, carrega a grid.
+                if (TabIndexInicial == 0)
+                {
+                    LimpaCampos();
+                    IsAlteracao = false;
+                    radFood.Checked = true;
+                }
+                else
+                {
+                    CarregaGrid();
+                }
             }
         }
 
         protected override void CarregaGrid()
         {
-            // Truque para forçar o DataGridView a reconhecer as novas colunas (Type)
+            // Força a atualização das colunas (incluindo "Type")
             dataGridViewConsulta.DataSource = null;
             dataGridViewConsulta.AutoGenerateColumns = true;
             dataGridViewConsulta.DataSource = _productService.Get<ProductViewModel>();
@@ -144,7 +154,7 @@ namespace Restaurant.App.Register
 
                 LimpaCampos();
                 CarregaGrid();
-                tabControlCadastro.SelectedIndex = 1;
+                tabControlCadastro.SelectedIndex = 1; // Vai para lista após salvar
             }
             catch (ValidationException vex)
             {
@@ -187,10 +197,6 @@ namespace Restaurant.App.Register
             {
                 txtProductName.Text = linha.Cells["Name"].Value?.ToString();
                 txtPrice.Text = linha.Cells["Price"].Value?.ToString();
-
-                // Nota: O grid simples pode não ter todas as colunas de Food/Drink (peso/volume),
-                // então ao editar, talvez precise buscar o objeto completo pelo ID se quiser preencher tudo.
-                // Mas para o nome e preço (básico) já funciona.
             }
         }
     }

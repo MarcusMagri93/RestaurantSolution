@@ -5,15 +5,12 @@ using System.Windows.Forms;
 
 namespace Restaurant.App
 {
-    // O formulário principal deve herdar de MaterialForm
     public partial class MainForm : MaterialForm
     {
-        // Injeção de dependência dos formulários filhos
         private readonly ProductForm _productForm;
         private readonly RegisterWaiterForm _registerWaiterForm;
         private readonly OrderForm _orderForm;
 
-        // O MainForm recebe as instâncias dos Forms via DI
         public MainForm(
             ProductForm productForm,
             RegisterWaiterForm registerWaiterForm,
@@ -27,19 +24,25 @@ namespace Restaurant.App
             this.Text = "Sistema de Gestão de Restaurante";
         }
 
-        // Exemplo de método para abrir o formulário de Produto
+        // Abre para CADASTRO (Aba 0)
         private void MenuProduct_Click(object sender, System.EventArgs e)
         {
+            _productForm.TabIndexInicial = 0; // Define aba de Cadastro
             _productForm.ShowDialog();
         }
 
-        // Exemplo de método para abrir o formulário de Garçom
+        // NOVO: Abre para LISTAGEM (Aba 1)
+        private void MenuListProducts_Click(object sender, System.EventArgs e)
+        {
+            _productForm.TabIndexInicial = 1; // Define aba de Consulta
+            _productForm.ShowDialog();
+        }
+
         private void MenuWaiter_Click(object sender, System.EventArgs e)
         {
             _registerWaiterForm.ShowDialog();
         }
 
-        // Exemplo de método para abrir o formulário de Pedido
         private void MenuOrder_Click(object sender, System.EventArgs e)
         {
             _orderForm.ShowDialog();
