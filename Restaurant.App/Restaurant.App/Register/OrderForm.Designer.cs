@@ -3,21 +3,26 @@ using ReaLTaiizor.Controls;
 
 namespace Restaurant.App.Register
 {
-    // A classe Designer é parcial e deve corresponder à classe principal OrderForm
     partial class OrderForm
     {
         private System.ComponentModel.IContainer components = null;
 
-        // Componentes específicos para o cabeçalho do Pedido
+        // Cabeçalho
         protected MaterialTextBoxEdit txtTableNumber;
         protected MaterialComboBox cmbWaiter;
         protected MaterialLabel lblTableNumber;
         protected MaterialLabel lblWaiter;
 
-        // Componente para a lista de itens do pedido
+        // Adição de Itens (NOVOS)
+        protected MaterialComboBox cmbProduct;
+        protected MaterialLabel lblProduct;
+        protected MaterialTextBoxEdit txtQuantity;
+        protected MaterialLabel lblQuantity;
+        protected MaterialButton btnAddItem;
+
+        // Lista de Itens
         protected DataGridView dgvOrderItems;
         protected MaterialLabel lblOrderItems;
-        protected MaterialButton btnAddItem; // Botão para adicionar itens
 
         protected override void Dispose(bool disposing)
         {
@@ -32,91 +37,90 @@ namespace Restaurant.App.Register
 
         private void InitializeComponent()
         {
-            this.txtTableNumber = new ReaLTaiizor.Controls.MaterialTextBoxEdit();
-            this.cmbWaiter = new ReaLTaiizor.Controls.MaterialComboBox();
-            this.lblTableNumber = new ReaLTaiizor.Controls.MaterialLabel();
-            this.lblWaiter = new ReaLTaiizor.Controls.MaterialLabel();
-            this.dgvOrderItems = new System.Windows.Forms.DataGridView();
-            this.lblOrderItems = new ReaLTaiizor.Controls.MaterialLabel();
-            this.btnAddItem = new ReaLTaiizor.Controls.MaterialButton();
+            this.txtTableNumber = new MaterialTextBoxEdit();
+            this.cmbWaiter = new MaterialComboBox();
+            this.lblTableNumber = new MaterialLabel();
+            this.lblWaiter = new MaterialLabel();
+            this.dgvOrderItems = new DataGridView();
+            this.lblOrderItems = new MaterialLabel();
+            this.btnAddItem = new MaterialButton();
 
-            // Chamada do InitializeComponent da classe base (IMPORTANTE!)
-            base.InitializeComponent();
+            // Novos Componentes
+            this.cmbProduct = new MaterialComboBox();
+            this.lblProduct = new MaterialLabel();
+            this.txtQuantity = new MaterialTextBoxEdit();
+            this.lblQuantity = new MaterialLabel();
 
-            // Configuração dos controles específicos
+            // NÃO chame base.InitializeComponent() aqui para evitar duplicação visual do pai
 
-            // 
-            // lblTableNumber
-            // 
+            this.tabPageCadastro.SuspendLayout();
+            this.SuspendLayout();
+
+            // 1. MESA
             this.lblTableNumber.AutoSize = true;
-            this.lblTableNumber.Location = new System.Drawing.Point(50, 50);
-            this.lblTableNumber.Size = new System.Drawing.Size(120, 20);
+            this.lblTableNumber.Location = new System.Drawing.Point(20, 20);
             this.lblTableNumber.Text = "Número da Mesa:";
-            this.lblTableNumber.Name = "lblTableNumber";
             this.tabPageCadastro.Controls.Add(this.lblTableNumber);
 
-            // 
-            // txtTableNumber
-            // 
-            this.txtTableNumber.Location = new System.Drawing.Point(50, 75);
+            this.txtTableNumber.Location = new System.Drawing.Point(20, 45);
             this.txtTableNumber.Size = new System.Drawing.Size(150, 36);
-            this.txtTableNumber.Name = "txtTableNumber";
             this.tabPageCadastro.Controls.Add(this.txtTableNumber);
 
-            // 
-            // lblWaiter
-            // 
+            // 2. GARÇOM
             this.lblWaiter.AutoSize = true;
-            this.lblWaiter.Location = new System.Drawing.Point(250, 50);
-            this.lblWaiter.Size = new System.Drawing.Size(70, 20);
+            this.lblWaiter.Location = new System.Drawing.Point(200, 20);
             this.lblWaiter.Text = "Garçom:";
-            this.lblWaiter.Name = "lblWaiter";
             this.tabPageCadastro.Controls.Add(this.lblWaiter);
 
-            // 
-            // cmbWaiter
-            // 
-            this.cmbWaiter.Location = new System.Drawing.Point(250, 75);
+            this.cmbWaiter.Location = new System.Drawing.Point(200, 45);
             this.cmbWaiter.Size = new System.Drawing.Size(250, 36);
-            this.cmbWaiter.Name = "cmbWaiter";
             this.tabPageCadastro.Controls.Add(this.cmbWaiter);
 
-            // 
-            // lblOrderItems
-            // 
-            this.lblOrderItems.AutoSize = true;
-            this.lblOrderItems.Location = new System.Drawing.Point(50, 150);
-            this.lblOrderItems.Size = new System.Drawing.Size(125, 20);
-            this.lblOrderItems.Text = "Itens do Pedido:";
-            this.lblOrderItems.Name = "lblOrderItems";
-            this.tabPageCadastro.Controls.Add(this.lblOrderItems);
+            // 3. PRODUTO (NOVO)
+            this.lblProduct.AutoSize = true;
+            this.lblProduct.Location = new System.Drawing.Point(20, 100);
+            this.lblProduct.Text = "Produto:";
+            this.tabPageCadastro.Controls.Add(this.lblProduct);
 
-            // 
-            // btnAddItem
-            // 
+            this.cmbProduct.Location = new System.Drawing.Point(20, 125);
+            this.cmbProduct.Size = new System.Drawing.Size(300, 36);
+            this.tabPageCadastro.Controls.Add(this.cmbProduct);
+
+            // 4. QUANTIDADE (NOVO)
+            this.lblQuantity.AutoSize = true;
+            this.lblQuantity.Location = new System.Drawing.Point(340, 100);
+            this.lblQuantity.Text = "Qtd:";
+            this.tabPageCadastro.Controls.Add(this.lblQuantity);
+
+            this.txtQuantity.Location = new System.Drawing.Point(340, 125);
+            this.txtQuantity.Size = new System.Drawing.Size(100, 36);
+            this.txtQuantity.Text = "1"; // Valor padrão
+            this.tabPageCadastro.Controls.Add(this.txtQuantity);
+
+            // 5. BOTÃO ADICIONAR
             this.btnAddItem.Text = "Adicionar Item";
-            this.btnAddItem.Location = new System.Drawing.Point(500, 145);
+            this.btnAddItem.Location = new System.Drawing.Point(460, 120);
             this.btnAddItem.Size = new System.Drawing.Size(150, 40);
-            this.btnAddItem.Name = "btnAddItem";
-            // Você pode adicionar um evento click aqui se quiser que o botão funcione
-            // this.btnAddItem.Click += new System.EventHandler(this.btnAddItem_Click);
+            this.btnAddItem.Click += new System.EventHandler(this.btnAddItem_Click); // Evento Importante
             this.tabPageCadastro.Controls.Add(this.btnAddItem);
 
-            // 
-            // dgvOrderItems
-            // 
-            this.dgvOrderItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvOrderItems.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvOrderItems.Location = new System.Drawing.Point(50, 190);
-            this.dgvOrderItems.Size = new System.Drawing.Size(700, 250);
-            this.dgvOrderItems.Name = "dgvOrderItems";
+            // 6. GRID DE ITENS
+            this.lblOrderItems.AutoSize = true;
+            this.lblOrderItems.Location = new System.Drawing.Point(20, 180);
+            this.lblOrderItems.Text = "Itens do Pedido:";
+            this.tabPageCadastro.Controls.Add(this.lblOrderItems);
+
+            this.dgvOrderItems.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvOrderItems.Location = new System.Drawing.Point(20, 205);
+            this.dgvOrderItems.Size = new System.Drawing.Size(640, 200);
+            this.dgvOrderItems.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.tabPageCadastro.Controls.Add(this.dgvOrderItems);
 
-            // Finaliza o layout da TabPage Cadastro
+            this.Text = "Gerenciamento de Pedidos";
+
             this.tabPageCadastro.ResumeLayout(false);
             this.tabPageCadastro.PerformLayout();
+            this.ResumeLayout(false);
         }
 
         #endregion

@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.Domain.Base;
-//using Restaurant.Domain.Interfaces.Base;
 using Restaurant.Repository.Context;
+using System;
 using System.Linq;
 
 namespace Restaurant.Repository.Repositories.Base
 {
-    // A implementação do Repositório Genérico
+    // A implementação do Repositório Genérico com tratamento de "Estado Limpo"
     public class BaseRepository<TEntity> : IBaseRepository<TEntity>
         where TEntity : BaseEntity<int>
     {
@@ -21,14 +21,43 @@ namespace Restaurant.Repository.Repositories.Base
 
         public void Add(TEntity obj)
         {
-            _dbSet.Add(obj);
-            _context.SaveChanges(); // Simplificado para fins de compilação
+            try
+            {
+                _dbSet.Add(obj);
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                // A MÁGICA ESTÁ AQUI:
+                // Se der erro (ex: duplicado), removemos esse objeto da memória do EF.
+                // Assim, na próxima tentativa, ele não atrapalha.
+                _context.Entry(obj).State = EntityState.Detached;
+
+                // Re-lançamos o erro para que o formulário mostre a mensagem (como já configuramos)
+                throw;
+            }
         }
 
         public void Update(TEntity obj)
         {
-            _dbSet.Update(obj);
-            _context.SaveChanges(); // Simplificado para fins de compilação
+            try
+            {
+                // Desanexa qualquer entidade local que possa conflitar com a atualização
+                var local = _dbSet.Local.FirstOrDefault(entry => entry.Id.Equals(obj.Id));
+                if (local != null)
+                {
+                    _context.Entry(local).State = EntityState.Detached;
+                }
+
+                _dbSet.Update(obj);
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                // Se falhar, limpa o estado também
+                _context.Entry(obj).State = EntityState.Detached;
+                throw;
+            }
         }
 
         public void Delete(int id)
@@ -36,19 +65,33 @@ namespace Restaurant.Repository.Repositories.Base
             var entity = GetById(id);
             if (entity != null)
             {
-                _dbSet.Remove(entity);
-                _context.SaveChanges(); // Simplificado para fins de compilação
+                try
+                {
+                    _dbSet.Remove(entity);
+                    _context.SaveChanges();
+                }
+                catch (Exception)
+                {
+                    _context.Entry(entity).State = EntityState.Unchanged;
+                    throw;
+                }
             }
         }
 
         public IQueryable<TEntity> Get()
         {
-            return _dbSet.AsQueryable();
+            return _dbSet.AsNoTracking();
         }
 
         public TEntity GetById(int id)
         {
-            return _dbSet.Find(id);
+            var entity = _dbSet.Find(id);
+
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
     }
 }

@@ -13,9 +13,10 @@ namespace Restaurant.Services.Validators
             RuleFor(c => c.WaiterId)
                 .GreaterThan(0).WithMessage("O pedido deve estar associado a um garçom.");
 
-            // Regra mais complexa: A lista de OrderItems não pode estar vazia.
-            RuleFor(c => c.OrderItems)
-                .NotEmpty().WithMessage("Um pedido deve ter pelo menos um item.");
+            // REMOVIDO: A regra que exigia itens ao criar o pedido.
+            // Agora permitimos criar o pedido vazio para depois adicionar os itens.
+            // RuleFor(c => c.OrderItems)
+            //    .NotEmpty().WithMessage("Um pedido deve ter pelo menos um item.");
         }
     }
 }

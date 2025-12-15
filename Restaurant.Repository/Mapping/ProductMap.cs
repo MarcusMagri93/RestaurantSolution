@@ -11,12 +11,15 @@ namespace Restaurant.Repository.Mapping
             builder.ToTable("Products");
             builder.HasKey(p => p.Id);
 
-            // CORREÇÃO 1: Define a coluna Price para usar DECIMAL, compatível com MySQL.
+            // --- CRUCIAL: TRAVA DE UNICIDADE ---
+            // Cria um índice único para o Nome. O banco rejeitará duplicatas.
+            builder.HasIndex(p => p.Name)
+                .IsUnique();
+
             builder.Property(p => p.Price)
                 .IsRequired()
                 .HasColumnType("decimal(10, 2)");
 
-            // CORREÇÃO 2: Garante que strings não usem 'NVARCHAR(MAX)'
             builder.Property(p => p.Name)
                 .HasMaxLength(255)
                 .IsRequired();

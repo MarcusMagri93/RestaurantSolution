@@ -11,12 +11,24 @@ namespace Restaurant.Repository.Mapping
             builder.ToTable("Waiters");
             builder.HasKey(w => w.Id);
 
-            // Relacionamento 1:N (Um Waiter tem muitas Orders)
+            builder.HasIndex(w => w.Registration)
+                .IsUnique();
+
+            // Configurações de propriedades
+            builder.Property(w => w.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(w => w.Registration)
+                .IsRequired()
+                .HasMaxLength(50); 
+
+            // Relacionamentos
             builder.HasMany(w => w.Orders)
                 .WithOne(o => o.Waiter)
                 .HasForeignKey(o => o.WaiterId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict); // Padrão PetShop
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

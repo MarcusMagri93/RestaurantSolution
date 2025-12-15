@@ -19,25 +19,43 @@ namespace Restaurant.App.Register
             InitializeComponent();
             _waiterService = waiterService;
 
-            // Força a aba de Cadastro a ser exibida
+            // Define a aba inicial como "Cadastro" na primeira carga
             this.tabControlCadastro.SelectedIndex = 0;
+        }
+
+        // --- SOLUÇÃO DO PROBLEMA DE TELA ---
+        // Este método roda toda vez que a janela se torna visível (quando você clica no menu).
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+
+            // Se a janela estiver abrindo (Visible = true)
+            if (this.Visible)
+            {
+                // Força a aba de Cadastro (índice 0)
+                this.tabControlCadastro.SelectedIndex = 0;
+
+                // Limpa os campos de texto (Nome, Registro, Senha)
+                LimpaCampos();
+
+                // Reseta a flag de edição para garantir que seja um NOVO cadastro
+                IsAlteracao = false;
+            }
         }
 
         protected override void CarregaGrid()
         {
+            // Carrega a lista de garçons para o DataGridView
             dataGridViewConsulta.DataSource = _waiterService.Get<WaiterViewModel>();
         }
 
-        // NOVO: Método para preencher a Entidade com dados do Formulário
+        // Método para preencher a Entidade com dados do Formulário
         private void FormToObject(Waiter waiter)
         {
-            // Capturando os campos do formulário (que são protected)
+            // Capturando os campos do formulário
             waiter.Name = txtWaiterName.Text;
             waiter.Registration = txtRegistration.Text;
             waiter.Password = txtPassword.Text;
-
-            // Outras propriedades obrigatórias da entidade, se houver:
-            // waiter.CreatedAt = DateTime.Now; 
         }
 
         protected override void Salvar()
@@ -45,7 +63,7 @@ namespace Restaurant.App.Register
             var waiter = new Waiter();
             FormToObject(waiter);
 
-            // Se for alteração, o ID deve ser preenchido:
+            // Se for alteração, o ID deve ser preenchido
             if (IsAlteracao && dataGridViewConsulta.SelectedRows.Count > 0)
             {
                 var selectedId = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
@@ -56,33 +74,42 @@ namespace Restaurant.App.Register
             {
                 if (IsAlteracao)
                 {
-                    // Chamada ALTERADA: Passa a Entidade (Waiter) em vez do InputModel
-                    // Isso desabilita o AutoMapper, mas ativará o Validador.
                     _waiterService.Update<Waiter, WaiterViewModel, WaiterValidator>(waiter);
-                    MessageBox.Show("Garçom alterado com sucesso!");
+                    MessageBox.Show("Garçom alterado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    // Chamada ALTERADA: Passa a Entidade (Waiter) em vez do InputModel
-                    // Isso desabilita o AutoMapper, mas ativará o Validador.
                     _waiterService.Add<Waiter, WaiterViewModel, WaiterValidator>(waiter);
-                    MessageBox.Show("Garçom cadastrado com sucesso!");
+                    MessageBox.Show("Garçom cadastrado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 LimpaCampos();
                 CarregaGrid();
+                // Vai para a aba de consulta após salvar com sucesso
                 tabControlCadastro.SelectedIndex = 1;
             }
-            // Captura de Validação (O método Add/Update do BaseService lança ValidationException)
             catch (ValidationException vex)
             {
+                // Erros de validação (regras de negócio)
                 var errors = string.Join("\n", vex.Errors);
                 MessageBox.Show(errors, "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                // Este catch capturará o erro de persistência ("Could not save changes...")
-                MessageBox.Show($"Erro ao salvar garçom: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // TRATAMENTO DE DUPLICIDADE
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("Duplicate entry"))
+                {
+                    MessageBox.Show(
+                        "Já existe um garçom cadastrado com este número de Registro.\nPor favor, escolha outro.",
+                        "Registro Duplicado",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Exclamation);
+                }
+                else
+                {
+                    // Erro genérico
+                    MessageBox.Show($"Erro ao salvar garçom: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -91,7 +118,7 @@ namespace Restaurant.App.Register
             try
             {
                 _waiterService.Delete(id);
-                MessageBox.Show("Garçom excluído com sucesso!");
+                MessageBox.Show("Garçom excluído com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -107,10 +134,10 @@ namespace Restaurant.App.Register
         {
             if (linha != null)
             {
-                // Carrega os dados da linha selecionada para os campos
+                // Preenche os campos para edição
                 txtWaiterName.Text = linha.Cells["Name"].Value?.ToString();
                 txtRegistration.Text = linha.Cells["Registration"].Value?.ToString();
-                // A senha nunca é carregada na ViewModel/Formulário por segurança
+                // A senha não é carregada por segurança
             }
         }
     }
