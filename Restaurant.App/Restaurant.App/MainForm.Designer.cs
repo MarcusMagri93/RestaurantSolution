@@ -7,11 +7,11 @@ namespace Restaurant.App
     {
         private System.ComponentModel.IContainer components = null;
 
-        // Componentes do menu
         protected MaterialButton btnMenuProduct;
-        protected MaterialButton btnMenuListProducts; // <--- NOVO BOTÃO
+        protected MaterialButton btnMenuListProducts;
         protected MaterialButton btnMenuWaiter;
         protected MaterialButton btnMenuOrder;
+        protected MaterialButton btnMonitor; // <--- NOVO BOTÃO
 
         protected override void Dispose(bool disposing)
         {
@@ -30,11 +30,12 @@ namespace Restaurant.App
             this.btnMenuListProducts = new ReaLTaiizor.Controls.MaterialButton();
             this.btnMenuWaiter = new ReaLTaiizor.Controls.MaterialButton();
             this.btnMenuOrder = new ReaLTaiizor.Controls.MaterialButton();
+            this.btnMonitor = new ReaLTaiizor.Controls.MaterialButton();
 
             this.SuspendLayout();
 
             // 
-            // btnMenuProduct (Cadastrar)
+            // btnMenuProduct
             // 
             this.btnMenuProduct.Text = "Cadastrar Produtos";
             this.btnMenuProduct.Location = new Point(20, 100);
@@ -43,10 +44,9 @@ namespace Restaurant.App
             this.Controls.Add(this.btnMenuProduct);
 
             // 
-            // btnMenuListProducts (Listar) - NOVO
+            // btnMenuListProducts
             // 
             this.btnMenuListProducts.Text = "Listar Produtos";
-            // Posicionado ao lado do cadastro (20 + 200 + 20 de margem = 240)
             this.btnMenuListProducts.Location = new Point(240, 100);
             this.btnMenuListProducts.Size = new Size(200, 40);
             this.btnMenuListProducts.Click += new System.EventHandler(this.MenuListProducts_Click);
@@ -69,6 +69,15 @@ namespace Restaurant.App
             this.btnMenuOrder.Size = new Size(200, 40);
             this.btnMenuOrder.Click += new System.EventHandler(this.MenuOrder_Click);
             this.Controls.Add(this.btnMenuOrder);
+
+            // 
+            // btnMonitor (NOVO)
+            // 
+            this.btnMonitor.Text = "Monitorar Mesas";
+            this.btnMonitor.Location = new Point(20, 280); // Abaixo de Pedidos
+            this.btnMonitor.Size = new Size(200, 40);
+            this.btnMonitor.Click += new System.EventHandler(this.btnMonitor_Click);
+            this.Controls.Add(this.btnMonitor);
 
             // 
             // MainForm

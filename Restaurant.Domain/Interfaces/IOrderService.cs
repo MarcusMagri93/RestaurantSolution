@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Restaurant.Domain.Base;
 using System;
 
-namespace Restaurant.Domain.Interfaces.Base // Namespace ajustado conforme o original
+namespace Restaurant.Domain.Interfaces.Base
 {
     public interface IOrderService : IBaseService<Order>
     {
@@ -15,7 +15,10 @@ namespace Restaurant.Domain.Interfaces.Base // Namespace ajustado conforme o ori
         double GetTotalRevenue(DateTime date);
         IList<Order> GetOpenOrders();
 
-        // Melhoria Etapa 2: Método para buscar pedidos com detalhes carregados
+        // Busca TODOS os pedidos (histórico completo) com detalhes
         IList<TOutputModel> GetAllWithDetails<TOutputModel>() where TOutputModel : class;
+
+        // NOVO: Busca APENAS os pedidos em aberto (Mesas Ativas) com detalhes
+        IList<TOutputModel> GetOpenOrdersWithDetails<TOutputModel>() where TOutputModel : class;
     }
 }

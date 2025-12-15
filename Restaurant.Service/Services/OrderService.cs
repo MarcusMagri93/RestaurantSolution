@@ -6,7 +6,7 @@ using Restaurant.Services.Services.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore; // Essencial para o Include
+using Microsoft.EntityFrameworkCore;
 
 namespace Restaurant.Services.Services
 {
@@ -26,13 +26,26 @@ namespace Restaurant.Services.Services
             _orderItemRepository = orderItemRepository;
         }
 
-        // --- Melhoria Etapa 2: Busca com Includes ---
+        // Busca histórico completo com detalhes
         public IList<TOutputModel> GetAllWithDetails<TOutputModel>() where TOutputModel : class
         {
             var orders = _repository.Get()
-                .Include(o => o.Waiter)      // Inclui o Garçom
-                .Include(o => o.OrderItems)  // Inclui os Itens
-                .ThenInclude(oi => oi.Product) // Inclui o Produto dentro do Item
+                .Include(o => o.Waiter)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .ToList();
+
+            return _mapper.Map<IList<TOutputModel>>(orders);
+        }
+
+        // NOVO: Busca apenas mesas ativas com detalhes
+        public IList<TOutputModel> GetOpenOrdersWithDetails<TOutputModel>() where TOutputModel : class
+        {
+            var orders = _repository.Get()
+                .Where(o => !o.IsPaid) // Filtro: Apenas não pagos
+                .Include(o => o.Waiter)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
                 .ToList();
 
             return _mapper.Map<IList<TOutputModel>>(orders);
@@ -64,11 +77,8 @@ namespace Restaurant.Services.Services
             if (product == null) throw new KeyNotFoundException($"Produto {productId} não encontrado.");
             if (quantity <= 0) throw new ArgumentException("Quantidade deve ser maior que zero.");
 
-            // Nota: O ideal aqui seria carregar OrderItems via Include no GetById ou carregar separadamente,
-            // mas mantendo a lógica simples e funcional para o contexto:
             if (order.OrderItems == null) order.OrderItems = new List<OrderItem>();
 
-            // Tenta achar na lista local (se carregada) ou assume novo
             var existingItem = order.OrderItems.FirstOrDefault(item => item.ProductId == productId);
 
             if (existingItem != null)
@@ -80,7 +90,6 @@ namespace Restaurant.Services.Services
             {
                 var newItem = new OrderItem(orderId, productId, quantity);
                 _orderItemRepository.Add(newItem);
-                // Adiciona na memória para o UpdateOrderTotal usar
                 order.OrderItems.Add(newItem);
             }
 
@@ -100,7 +109,6 @@ namespace Restaurant.Services.Services
 
         private void UpdateOrderTotal(int orderId)
         {
-            // Recarrega o pedido com itens para garantir o cálculo correto
             var order = _repository.Get()
                 .Include(o => o.OrderItems)
                 .FirstOrDefault(o => o.Id == orderId);
@@ -125,7 +133,6 @@ namespace Restaurant.Services.Services
 
         public Order GetOrder(int orderId)
         {
-            // Garante que ao editar o pedido, os itens venham junto
             return _repository.Get()
                 .Include(o => o.OrderItems)
                 .ThenInclude(i => i.Product)
