@@ -6,7 +6,6 @@ using System.Linq;
 
 namespace Restaurant.Repository.Repositories.Base
 {
-    // A implementação do Repositório Genérico com tratamento de "Estado Limpo"
     public class BaseRepository<TEntity> : IBaseRepository<TEntity>
         where TEntity : BaseEntity<int>
     {
@@ -25,15 +24,12 @@ namespace Restaurant.Repository.Repositories.Base
             {
                 _dbSet.Add(obj);
                 _context.SaveChanges();
+                // CORREÇÃO: Remove o objeto da memória após salvar para evitar conflitos
+                _context.Entry(obj).State = EntityState.Detached;
             }
             catch (Exception)
             {
-                // A MÁGICA ESTÁ AQUI:
-                // Se der erro (ex: duplicado), removemos esse objeto da memória do EF.
-                // Assim, na próxima tentativa, ele não atrapalha.
                 _context.Entry(obj).State = EntityState.Detached;
-
-                // Re-lançamos o erro para que o formulário mostre a mensagem (como já configuramos)
                 throw;
             }
         }
@@ -42,7 +38,6 @@ namespace Restaurant.Repository.Repositories.Base
         {
             try
             {
-                // Desanexa qualquer entidade local que possa conflitar com a atualização
                 var local = _dbSet.Local.FirstOrDefault(entry => entry.Id.Equals(obj.Id));
                 if (local != null)
                 {
@@ -51,10 +46,11 @@ namespace Restaurant.Repository.Repositories.Base
 
                 _dbSet.Update(obj);
                 _context.SaveChanges();
+                // CORREÇÃO: Remove o objeto da memória após atualizar
+                _context.Entry(obj).State = EntityState.Detached;
             }
             catch (Exception)
             {
-                // Se falhar, limpa o estado também
                 _context.Entry(obj).State = EntityState.Detached;
                 throw;
             }

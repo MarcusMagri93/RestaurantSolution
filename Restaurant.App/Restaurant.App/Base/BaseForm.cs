@@ -1,31 +1,37 @@
 ﻿using ReaLTaiizor.Controls;
 using ReaLTaiizor.Forms;
-using System; // Adicionado: Essencial para EventArgs
-using System.Windows.Forms; // Adicionado: Essencial para MessageBox, DialogResult, DataGridView, etc.
+using System;
+using System.Windows.Forms;
 
-namespace Restaurant.App.Base // Certifique-se que o namespace está correto
+namespace Restaurant.App.Base
 {
     public partial class BaseForm : MaterialForm
     {
-        #region Declarações
         protected bool IsAlteracao = false;
 
-        #endregion
-
-        #region Construtor
         public BaseForm()
         {
             InitializeComponent();
+            // Associa o evento de mudança de aba
+            tabControlCadastro.SelectedIndexChanged += TabControlCadastro_SelectedIndexChanged;
         }
-        #endregion
 
-        #region Eventos form
+        // --- Oculta botões na aba de consulta ---
+        private void TabControlCadastro_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            // Aba 0 = Cadastro (Botões visíveis)
+            // Aba 1 = Consulta (Botões invisíveis)
+            bool isCadastro = tabControlCadastro.SelectedIndex == 0;
+
+            btnSalvar.Visible = isCadastro;
+            btnCancelar.Visible = isCadastro;
+        }
+
         private void btnCancelar_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show(@"Deseja realmente cancelar?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 LimpaCampos();
-                // Componente declarado no BaseForm.Designer.cs
                 tabControlCadastro.SelectedIndex = 1;
             }
         }
@@ -47,12 +53,10 @@ namespace Restaurant.App.Base // Certifique-se que o namespace está correto
 
         private void btnExcluir_Click(object sender, EventArgs e)
         {
-            // Componente declarado no BaseForm.Designer.cs
             if (dataGridViewConsulta.SelectedRows.Count > 0)
             {
                 if (MessageBox.Show(@"Deseja realmente excluir?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    // Obtém o ID da linha selecionada
                     int id = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
                     Deletar(id);
                     CarregaGrid();
@@ -72,44 +76,25 @@ namespace Restaurant.App.Base // Certifique-se que o namespace está correto
         {
             Editar();
         }
-        #endregion
 
-        #region Eventos CRUD
         protected void LimpaCampos()
         {
             IsAlteracao = false;
-            // Componente declarado no BaseForm.Designer.cs
             foreach (var control in tabPageCadastro.Controls)
             {
-                // Verificação e limpeza de componentes ReaLTaiizor
-                if (control is MaterialTextBoxEdit materialTextBoxEdit)
-                {
-                    materialTextBoxEdit.Clear();
-                }
-                if (control is MaterialMaskedTextBox materialMaskedTextBox)
-                {
-                    materialMaskedTextBox.Clear();
-                }
+                if (control is MaterialTextBoxEdit materialTextBoxEdit) materialTextBoxEdit.Clear();
+                if (control is MaterialMaskedTextBox materialMaskedTextBox) materialMaskedTextBox.Clear();
             }
         }
 
-        // Métodos virtuais para implementação nas classes filhas
-        protected virtual void CarregaGrid()
-        {
-        }
-
+        protected virtual void CarregaGrid() { }
         protected virtual void Novo()
         {
             LimpaCampos();
             tabControlCadastro.SelectedIndex = 0;
             tabControlCadastro.Focus();
         }
-
-        protected virtual void Salvar()
-        {
-
-        }
-
+        protected virtual void Salvar() { }
         protected virtual void Editar()
         {
             if (dataGridViewConsulta.SelectedRows.Count > 0)
@@ -125,18 +110,7 @@ namespace Restaurant.App.Base // Certifique-se que o namespace está correto
                 MessageBox.Show(@"Selecione algum registro!", @"Restaurant App", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-
-        protected virtual void Deletar(int id)
-        {
-
-        }
-
-        // Usa o tipo DataGridViewRow, que exige o 'using System.Windows.Forms'
-        protected virtual void CarregaRegistro(DataGridViewRow? linha)
-        {
-
-        }
-
-        #endregion
+        protected virtual void Deletar(int id) { }
+        protected virtual void CarregaRegistro(DataGridViewRow? linha) { }
     }
 }

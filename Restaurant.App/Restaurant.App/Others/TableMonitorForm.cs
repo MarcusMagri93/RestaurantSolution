@@ -11,16 +11,12 @@ namespace Restaurant.App.Others
     public partial class TableMonitorForm : MaterialForm
     {
         private readonly IOrderService _orderService;
-
-        // Lista em memória para facilitar a navegação mestre-detalhe
         private List<OrderViewModel> _activeOrders = new List<OrderViewModel>();
 
         public TableMonitorForm(IOrderService orderService)
         {
             InitializeComponent();
             _orderService = orderService;
-
-            // Configura o evento de seleção da tabela
             dgvTables.SelectionChanged += DgvTables_SelectionChanged;
         }
 
@@ -43,27 +39,49 @@ namespace Restaurant.App.Others
             this.Close();
         }
 
+        // --- BOTÃO FECHAR CONTA ---
+        private void btnCloseBill_Click(object sender, EventArgs e)
+        {
+            if (dgvTables.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Selecione uma mesa para fechar a conta.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int orderId = (int)dgvTables.SelectedRows[0].Cells["Id"].Value;
+            int tableNum = (int)dgvTables.SelectedRows[0].Cells["Mesa"].Value;
+
+            if (MessageBox.Show($"Deseja realmente fechar a conta da Mesa {tableNum}?", "Confirmar Fechamento", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try
+                {
+                    _orderService.CloseBill(orderId);
+                    MessageBox.Show($"Mesa {tableNum} fechada com sucesso!");
+                    CarregarMonitor(); // A mesa paga sumirá da lista
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao fechar mesa: " + ex.Message);
+                }
+            }
+        }
+
         private void CarregarMonitor()
         {
             try
             {
-                // Busca dados atualizados do serviço
                 _activeOrders = _orderService.GetOpenOrdersWithDetails<OrderViewModel>().ToList();
 
-                // Monta a lista resumida para o Grid da Esquerda (Mestre)
                 var tablesDisplay = _activeOrders.Select(o => new
                 {
-                    Id = o.Id, // Oculto, mas útil para chave
+                    Id = o.Id,
                     Mesa = o.TableNumber,
                     Garcom = o.Waiter != null ? o.Waiter.Name : "N/A"
                 }).OrderBy(x => x.Mesa).ToList();
 
                 dgvTables.DataSource = tablesDisplay;
-
-                // Oculta coluna ID se desejar
                 if (dgvTables.Columns["Id"] != null) dgvTables.Columns["Id"].Visible = false;
 
-                // Se houver mesas, seleciona a primeira automaticamente
                 if (dgvTables.Rows.Count > 0)
                 {
                     dgvTables.Rows[0].Selected = true;
@@ -71,7 +89,6 @@ namespace Restaurant.App.Others
                 }
                 else
                 {
-                    // Limpa detalhes se não houver mesas
                     dgvDetails.DataSource = null;
                     lblTotalValue.Text = "R$ 0,00";
                 }
@@ -104,9 +121,7 @@ namespace Restaurant.App.Others
 
                 var itemsDisplay = selectedOrder.OrderItems.Select(i =>
                 {
-                    // CORREÇÃO AQUI: Convertendo explicitamente double para decimal
                     decimal unitPrice = i.Product != null ? (decimal)i.Product.Price : 0;
-
                     decimal subtotal = unitPrice * i.Quantity;
                     calculatedTotal += subtotal;
 

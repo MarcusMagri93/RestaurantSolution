@@ -34,7 +34,6 @@ namespace Restaurant.App.Register
             _waiterService = waiterService;
             _productService = productService;
 
-            // Define a aba inicial mas NÃO carrega os combos aqui
             this.tabControlCadastro.SelectedIndex = 0;
         }
 
@@ -88,7 +87,7 @@ namespace Restaurant.App.Register
                         Id = i.Id,
                         Produto = i.Product != null ? i.Product.Name : "Produto " + i.ProductId,
                         Qtd = i.Quantity,
-                        Total = ((decimal)(i.Product?.Price ?? 0)) * i.Quantity // Conversão para decimal
+                        Total = ((decimal)(i.Product?.Price ?? 0)) * i.Quantity
                     }).ToList();
 
                     dgvOrderItems.DataSource = itensGrid;
@@ -100,40 +99,25 @@ namespace Restaurant.App.Register
             }
         }
 
-        // --- LÓGICA DE PREVENÇÃO DE DUPLICIDADE ---
-        private bool VerificarMesaOcupada(int tableNumber)
+        // --- NOVA LÓGICA SILENCIOSA ---
+        private void CarregarPedidoSeExistir(int tableNumber)
         {
-            // Busca se existe algum pedido NÃO PAGO para esta mesa
             var pedidoExistente = _orderService.GetOpenOrders()
                                                .FirstOrDefault(o => o.TableNumber == tableNumber);
 
-            if (pedidoExistente != null && pedidoExistente.Id != _currentOrderId)
+            if (pedidoExistente != null)
             {
-                var confirm = MessageBox.Show(
-                    $"A Mesa {tableNumber} já possui um pedido aberto (Nº {pedidoExistente.Id}).\n\nDeseja carregar este pedido existente para continuar lançando itens nele?",
-                    "Mesa Ocupada",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
+                // Carrega automaticamente sem perguntar
+                _currentOrderId = pedidoExistente.Id;
+                IsAlteracao = true;
 
-                if (confirm == DialogResult.Yes)
-                {
-                    // Carrega o pedido existente
-                    _currentOrderId = pedidoExistente.Id;
-                    IsAlteracao = true;
+                // Preenche visualmente os campos para consistência
+                txtTableNumber.Text = pedidoExistente.TableNumber.ToString();
+                if (pedidoExistente.WaiterId > 0)
+                    cmbWaiter.SelectedValue = pedidoExistente.WaiterId;
 
-                    // Preenche os campos
-                    txtTableNumber.Text = pedidoExistente.TableNumber.ToString();
-                    if (pedidoExistente.WaiterId > 0) cmbWaiter.SelectedValue = pedidoExistente.WaiterId;
-
-                    CarregaItensPedido();
-                    return true; // Indica que recuperamos um existente
-                }
-                else
-                {
-                    return false; // Usuário cancelou
-                }
+                CarregaItensPedido();
             }
-            return false; // Mesa livre
         }
 
         protected override void Salvar()
@@ -154,12 +138,8 @@ namespace Restaurant.App.Register
 
                 int tableNum = int.Parse(txtTableNumber.Text);
 
-                // Se for novo pedido, verifica se a mesa já está ocupada
-                if (_currentOrderId == 0)
-                {
-                    bool recuperou = VerificarMesaOcupada(tableNum);
-                    if (recuperou) return; // Já carregou o existente, não precisa salvar novo agora
-                }
+                // Verifica silenciosamente
+                if (_currentOrderId == 0) CarregarPedidoSeExistir(tableNum);
 
                 var order = new Order
                 {
@@ -180,7 +160,7 @@ namespace Restaurant.App.Register
                     var savedOrder = _baseOrderService.Add<Order, OrderViewModel, OrderValidator>(order);
                     _currentOrderId = savedOrder.Id;
                     IsAlteracao = true;
-                    MessageBox.Show($"Pedido #{savedOrder.Id} iniciado! Agora adicione os itens.");
+                    MessageBox.Show($"Pedido #{savedOrder.Id} iniciado!");
                 }
 
                 CarregaGrid();
@@ -200,48 +180,34 @@ namespace Restaurant.App.Register
         {
             try
             {
-                // 1. AUTO-SAVE com Verificação
-                if (_currentOrderId == 0)
+                if (string.IsNullOrEmpty(txtTableNumber.Text) || cmbWaiter.SelectedValue == null)
                 {
-                    if (string.IsNullOrEmpty(txtTableNumber.Text) || cmbWaiter.SelectedValue == null)
-                    {
-                        MessageBox.Show("Preencha a Mesa e o Garçom para iniciar o pedido.");
-                        return;
-                    }
-
-                    int tableNum = int.Parse(txtTableNumber.Text);
-
-                    // Verifica mesa ocupada antes de criar
-                    bool recuperou = VerificarMesaOcupada(tableNum);
-
-                    if (!recuperou)
-                    {
-                        // Se não recuperou e não cancelou (ou seja, mesa livre), cria novo
-                        // Mas se o usuário cancelou na msgbox, VerificarMesaOcupada retorna false?
-                        // Ajuste lógico: Se existia e usuário disse NÃO, não devemos criar duplicado.
-                        // Vamos simplificar: se existe, FORÇA o uso ou cancela.
-
-                        var existe = _orderService.GetOpenOrders().Any(o => o.TableNumber == tableNum);
-                        if (existe)
-                        {
-                            MessageBox.Show("Operação cancelada: Mesa já ocupada.");
-                            return;
-                        }
-
-                        var order = new Order
-                        {
-                            TableNumber = tableNum,
-                            WaiterId = (int)cmbWaiter.SelectedValue,
-                            IsPaid = false,
-                            TotalAmount = 0
-                        };
-
-                        var savedOrder = _baseOrderService.Add<Order, OrderViewModel, OrderValidator>(order);
-                        _currentOrderId = savedOrder.Id;
-                        IsAlteracao = true;
-                    }
+                    MessageBox.Show("Preencha a Mesa e o Garçom para iniciar o pedido.");
+                    return;
                 }
 
+                int tableNum = int.Parse(txtTableNumber.Text);
+
+                // 1. Tenta recuperar existente (silencioso)
+                if (_currentOrderId == 0) CarregarPedidoSeExistir(tableNum);
+
+                // 2. Se não existia, cria novo agora
+                if (_currentOrderId == 0)
+                {
+                    var order = new Order
+                    {
+                        TableNumber = tableNum,
+                        WaiterId = (int)cmbWaiter.SelectedValue,
+                        IsPaid = false,
+                        TotalAmount = 0
+                    };
+
+                    var savedOrder = _baseOrderService.Add<Order, OrderViewModel, OrderValidator>(order);
+                    _currentOrderId = savedOrder.Id;
+                    IsAlteracao = true;
+                }
+
+                // 3. Adiciona Item
                 if (cmbProduct.SelectedValue == null)
                 {
                     MessageBox.Show("Selecione um produto.");
