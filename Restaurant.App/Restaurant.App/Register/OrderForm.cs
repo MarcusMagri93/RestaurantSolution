@@ -34,9 +34,8 @@ namespace Restaurant.App.Register
             _waiterService = waiterService;
             _productService = productService;
 
-            // Garante que a aba inicial seja a de Cadastro
+            // Define a aba inicial mas NÃO carrega os combos aqui (para corrigir o bug)
             this.tabControlCadastro.SelectedIndex = 0;
-            CarregaCombos();
         }
 
         protected override void OnVisibleChanged(EventArgs e)
@@ -44,11 +43,17 @@ namespace Restaurant.App.Register
             base.OnVisibleChanged(e);
             if (this.Visible)
             {
+                // Carrega os combos TODA VEZ que a tela aparece.
+                // Isso resolve o problema do produto novo não aparecer.
+                CarregaCombos();
+
                 this.tabControlCadastro.SelectedIndex = 0;
                 LimpaCampos();
-                _currentOrderId = 0; // Reseta para novo pedido
+                _currentOrderId = 0;
                 dgvOrderItems.DataSource = null;
                 IsAlteracao = false;
+
+                CarregaGrid(); // Atualiza a lista de consultas
             }
         }
 
@@ -60,7 +65,7 @@ namespace Restaurant.App.Register
             cmbWaiter.DisplayMember = "Name";
             cmbWaiter.ValueMember = "Id";
 
-            // Carrega Produtos
+            // Carrega Produtos (Sempre atualizado do banco)
             var products = _productService.Get<ProductViewModel>().ToList();
             cmbProduct.DataSource = products;
             cmbProduct.DisplayMember = "Name";
@@ -69,7 +74,13 @@ namespace Restaurant.App.Register
 
         protected override void CarregaGrid()
         {
-            dataGridViewConsulta.DataSource = _baseOrderService.Get<OrderViewModel>();
+            // Reseta a fonte de dados para forçar a criação da coluna "ProductsSummary"
+            dataGridViewConsulta.DataSource = null;
+            dataGridViewConsulta.AutoGenerateColumns = true;
+
+            // Usa o método que traz os detalhes para preencher o resumo
+            dataGridViewConsulta.DataSource = _orderService.GetAllWithDetails<OrderViewModel>();
+            dataGridViewConsulta.Refresh();
         }
 
         private void CarregaItensPedido()
@@ -78,7 +89,6 @@ namespace Restaurant.App.Register
 
             try
             {
-                // Busca o pedido detalhado para mostrar os itens no grid de baixo
                 var order = _orderService.GetOrder(_currentOrderId);
                 if (order != null && order.OrderItems != null)
                 {
@@ -87,7 +97,6 @@ namespace Restaurant.App.Register
                         Id = i.Id,
                         Produto = i.Product != null ? i.Product.Name : "Produto " + i.ProductId,
                         Qtd = i.Quantity,
-                        // PrecoUnit = i.Product?.Price ?? 0, // Opcional
                         Total = (i.Product?.Price ?? 0) * i.Quantity
                     }).ToList();
 
@@ -96,19 +105,23 @@ namespace Restaurant.App.Register
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                MessageBox.Show("Erro ao carregar itens: " + ex.Message);
             }
         }
 
-        // --- SALVAR (CABEÇALHO) ---
         protected override void Salvar()
         {
             try
             {
-                // Validação básica manual
                 if (string.IsNullOrEmpty(txtTableNumber.Text))
                 {
                     MessageBox.Show("Informe o número da mesa.");
+                    return;
+                }
+
+                if (cmbWaiter.SelectedValue == null)
+                {
+                    MessageBox.Show("Selecione um garçom.");
                     return;
                 }
 
@@ -134,9 +147,7 @@ namespace Restaurant.App.Register
                     MessageBox.Show($"Pedido #{savedOrder.Id} iniciado! Agora adicione os itens.");
                 }
 
-                CarregaGrid(); // Atualiza lista da aba de consulta
-                // IMPORTANTE: Não limpamos os campos nem mudamos de aba aqui
-                // para permitir que o usuário continue adicionando itens.
+                CarregaGrid();
             }
             catch (ValidationException vex)
             {
@@ -149,12 +160,10 @@ namespace Restaurant.App.Register
             }
         }
 
-        // --- ADICIONAR ITEM (COM AUTO-SAVE) ---
         private void btnAddItem_Click(object sender, EventArgs e)
         {
             try
             {
-                // 1. AUTO-SAVE: Se o pedido não existe, cria ele agora
                 if (_currentOrderId == 0)
                 {
                     if (string.IsNullOrEmpty(txtTableNumber.Text) || cmbWaiter.SelectedValue == null)
@@ -171,13 +180,11 @@ namespace Restaurant.App.Register
                         TotalAmount = 0
                     };
 
-                    // Salva silenciosamente para gerar o ID
                     var savedOrder = _baseOrderService.Add<Order, OrderViewModel, OrderValidator>(order);
                     _currentOrderId = savedOrder.Id;
                     IsAlteracao = true;
                 }
 
-                // 2. Adiciona o Item
                 if (cmbProduct.SelectedValue == null)
                 {
                     MessageBox.Show("Selecione um produto.");
@@ -189,9 +196,8 @@ namespace Restaurant.App.Register
 
                 _orderService.AddItemToOrder(_currentOrderId, productId, quantity);
 
-                // 3. Atualiza as telas
-                CarregaItensPedido(); // Atualiza o grid de itens
-                CarregaGrid(); // Atualiza o total na lista de pedidos
+                CarregaItensPedido();
+                CarregaGrid();
 
                 MessageBox.Show("Item adicionado!");
             }
@@ -226,12 +232,12 @@ namespace Restaurant.App.Register
                 _currentOrderId = (int)linha.Cells["Id"].Value;
                 txtTableNumber.Text = linha.Cells["TableNumber"].Value?.ToString();
 
-                // Tenta selecionar o garçom no combo
                 if (linha.Cells["WaiterId"].Value != null)
                     cmbWaiter.SelectedValue = (int)linha.Cells["WaiterId"].Value;
 
                 IsAlteracao = true;
                 CarregaItensPedido();
+                tabControlCadastro.SelectedIndex = 0; // Volta para aba de cadastro para ver os itens
             }
         }
     }

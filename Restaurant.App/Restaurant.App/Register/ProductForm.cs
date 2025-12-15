@@ -5,16 +5,14 @@ using Restaurant.Domain.Entities;
 using Restaurant.Services.Validators;
 using System;
 using System.Windows.Forms;
-using System.Linq; // Essencial para o .Any() funcionar
+using System.Linq;
 using FluentValidation;
 
 namespace Restaurant.App.Register
 {
     public partial class ProductForm : BaseForm
     {
-        // Serviço genérico para buscar TODOS os produtos
         private readonly IBaseService<Product> _productService;
-        // Serviços específicos para salvar
         private readonly IBaseService<Food> _foodService;
         private readonly IBaseService<Drink> _drinkService;
 
@@ -58,28 +56,31 @@ namespace Restaurant.App.Register
                 LimpaCampos();
                 IsAlteracao = false;
                 radFood.Checked = true;
+
+                // Força o carregamento da grid para garantir que as colunas novas apareçam
+                CarregaGrid();
             }
         }
 
         protected override void CarregaGrid()
         {
+            // Truque para forçar o DataGridView a reconhecer as novas colunas (Type)
+            dataGridViewConsulta.DataSource = null;
+            dataGridViewConsulta.AutoGenerateColumns = true;
             dataGridViewConsulta.DataSource = _productService.Get<ProductViewModel>();
+            dataGridViewConsulta.Refresh();
         }
 
         protected override void Salvar()
         {
             try
             {
-                // 1. Captura e limpa o nome
                 string nomeProduto = txtProductName.Text.Trim();
 
-                // 2. Busca lista atualizada do banco
                 var produtosExistentes = _productService.Get<ProductViewModel>();
 
-                // 3. VERIFICAÇÃO ROBUSTA (Ignora maiúsculas/minúsculas)
                 bool produtoJaExiste = produtosExistentes.Any(p =>
                     p.Name.Equals(nomeProduto, StringComparison.OrdinalIgnoreCase) &&
-                    // Garante que não estamos comparando com o próprio produto na edição
                     (!IsAlteracao || p.Id != (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value)
                 );
 
@@ -90,10 +91,9 @@ namespace Restaurant.App.Register
                         "Duplicidade Encontrada",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
-                    return; // Para tudo e não tenta salvar
+                    return;
                 }
 
-                // 4. Se passou, prossegue com o salvamento
                 if (radFood.Checked)
                 {
                     var food = new Food
@@ -118,7 +118,7 @@ namespace Restaurant.App.Register
                         MessageBox.Show("Prato cadastrado!");
                     }
                 }
-                else // Bebida
+                else
                 {
                     var drink = new Drink
                     {
@@ -153,7 +153,6 @@ namespace Restaurant.App.Register
             }
             catch (Exception ex)
             {
-                // Tratamento final caso o banco devolva erro de duplicidade (segunda barreira)
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("Duplicate entry"))
                 {
                     MessageBox.Show("O Banco de Dados bloqueou este cadastro pois o nome já existe.", "Erro de Banco", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -188,6 +187,10 @@ namespace Restaurant.App.Register
             {
                 txtProductName.Text = linha.Cells["Name"].Value?.ToString();
                 txtPrice.Text = linha.Cells["Price"].Value?.ToString();
+
+                // Nota: O grid simples pode não ter todas as colunas de Food/Drink (peso/volume),
+                // então ao editar, talvez precise buscar o objeto completo pelo ID se quiser preencher tudo.
+                // Mas para o nome e preço (básico) já funciona.
             }
         }
     }

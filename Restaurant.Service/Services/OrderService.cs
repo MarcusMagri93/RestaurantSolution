@@ -1,35 +1,42 @@
 ﻿using AutoMapper;
 using Restaurant.Domain.Base;
 using Restaurant.Domain.Entities;
-using Restaurant.Domain.Interfaces;
 using Restaurant.Domain.Interfaces.Base;
-using Restaurant.Domain.Base; 
-using Restaurant.Services.Services.Base; 
+using Restaurant.Services.Services.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore; // Essencial para o Include
 
 namespace Restaurant.Services.Services
 {
     public class OrderService : BaseService<Order>, IOrderService
     {
-        // Repositórios necessários. IBaseRepository injeta o repositório genérico.
         protected readonly IBaseRepository<Product> _productRepository;
         protected readonly IBaseRepository<OrderItem> _orderItemRepository;
 
         public OrderService(
-            // O primeiro parâmetro deve ser IBaseRepository<Order> para o BaseService
             IBaseRepository<Order> baseRepository,
             IBaseRepository<Product> productRepository,
             IBaseRepository<OrderItem> orderItemRepository,
             IMapper mapper)
-            : base(baseRepository, mapper) // Chamada correta ao construtor da classe base
+            : base(baseRepository, mapper)
         {
             _productRepository = productRepository;
             _orderItemRepository = orderItemRepository;
         }
 
-        // --- Implementação dos Métodos da IOrderService ---
+        // --- Melhoria Etapa 2: Busca com Includes ---
+        public IList<TOutputModel> GetAllWithDetails<TOutputModel>() where TOutputModel : class
+        {
+            var orders = _repository.Get()
+                .Include(o => o.Waiter)      // Inclui o Garçom
+                .Include(o => o.OrderItems)  // Inclui os Itens
+                .ThenInclude(oi => oi.Product) // Inclui o Produto dentro do Item
+                .ToList();
+
+            return _mapper.Map<IList<TOutputModel>>(orders);
+        }
 
         public Order CreateOrder(int tableNumber, int waiterId)
         {
@@ -40,27 +47,28 @@ namespace Restaurant.Services.Services
             {
                 TableNumber = tableNumber,
                 WaiterId = waiterId,
-                TotalAmount = 0, // CORRIGIDO: Usando TotalAmount
+                TotalAmount = 0,
                 OrderItems = new List<OrderItem>()
             };
 
-            // CORRIGIDO: Usando _repository (campo da classe base) e método Add
             _repository.Add(newOrder);
-
-            // Nota: Se você estiver usando IUnitOfWork, o commit será feito fora deste serviço.
             return newOrder;
         }
 
         public void AddItemToOrder(int orderId, int productId, int quantity)
         {
-            // CORRIGIDO: Usando _repository e método GetById
             var order = _repository.GetById(orderId);
-            var product = _productRepository.GetById(productId); // CORRIGIDO: Usando GetById
+            var product = _productRepository.GetById(productId);
 
             if (order == null) throw new KeyNotFoundException($"Pedido {orderId} não encontrado.");
             if (product == null) throw new KeyNotFoundException($"Produto {productId} não encontrado.");
             if (quantity <= 0) throw new ArgumentException("Quantidade deve ser maior que zero.");
 
+            // Nota: O ideal aqui seria carregar OrderItems via Include no GetById ou carregar separadamente,
+            // mas mantendo a lógica simples e funcional para o contexto:
+            if (order.OrderItems == null) order.OrderItems = new List<OrderItem>();
+
+            // Tenta achar na lista local (se carregada) ou assume novo
             var existingItem = order.OrderItems.FirstOrDefault(item => item.ProductId == productId);
 
             if (existingItem != null)
@@ -70,64 +78,61 @@ namespace Restaurant.Services.Services
             }
             else
             {
-                // Este construtor pode falhar se OrderItem não tiver construtor que receba 3 ints
                 var newItem = new OrderItem(orderId, productId, quantity);
-                _orderItemRepository.Add(newItem); // CORRIGIDO: Usando Add
-
+                _orderItemRepository.Add(newItem);
+                // Adiciona na memória para o UpdateOrderTotal usar
                 order.OrderItems.Add(newItem);
             }
 
             UpdateOrderTotal(orderId);
-            // Salva o Order modificado
             _repository.Update(order);
         }
 
         public void CloseBill(int orderId)
         {
-            var order = _repository.GetById(orderId); // CORRIGIDO: Usando GetById
+            var order = _repository.GetById(orderId);
             if (order == null) throw new KeyNotFoundException($"Pedido {orderId} não encontrado.");
 
             UpdateOrderTotal(orderId);
-            order.IsPaid = true; // Assumindo que você tem IsPaid na entidade Order.
+            order.IsPaid = true;
             _repository.Update(order);
         }
 
         private void UpdateOrderTotal(int orderId)
         {
-            // O serviço precisa carregar a lista de itens relacionados
-            // Nota: Esta lógica deve ser refinada para usar includes no repositório.
-            var order = _repository.Get().FirstOrDefault(o => o.Id == orderId);
+            // Recarrega o pedido com itens para garantir o cálculo correto
+            var order = _repository.Get()
+                .Include(o => o.OrderItems)
+                .FirstOrDefault(o => o.Id == orderId);
 
             if (order == null) return;
 
-            // CORRIGIDO: Inicializando como decimal
             decimal total = 0;
 
-            // Recalcula o total (requer carregar o preço do produto)
             foreach (var item in order.OrderItems)
             {
-                // CORRIGIDO: O repositório deve ser GetById, não Select
                 var product = _productRepository.GetById(item.ProductId);
-
                 if (product != null)
                 {
-                    
                     decimal itemPrice = Convert.ToDecimal(product.Price);
-
-                    
                     total += item.Quantity * itemPrice;
                 }
             }
 
-            
             order.TotalAmount = total;
-
             _repository.Update(order);
         }
 
-        // Outros métodos
-        public Order GetOrder(int orderId) => _repository.GetById(orderId); // CORRIGIDO: Usando GetById
+        public Order GetOrder(int orderId)
+        {
+            // Garante que ao editar o pedido, os itens venham junto
+            return _repository.Get()
+                .Include(o => o.OrderItems)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefault(o => o.Id == orderId);
+        }
+
         public double GetTotalRevenue(DateTime date) => (double)_repository.Get().Sum(o => o.TotalAmount);
-        public IList<Order> GetOpenOrders() => _repository.Get().Where(o => !o.IsPaid).ToList(); // Adicionei filtro
+        public IList<Order> GetOpenOrders() => _repository.Get().Where(o => !o.IsPaid).ToList();
     }
 }
