@@ -15,9 +15,8 @@ namespace Restaurant.App.Others
         protected MaterialLabel lblTotalLabel;
         protected MaterialLabel lblTotalValue;
 
-        protected MaterialButton btnRefresh;
         protected MaterialButton btnClose;
-        protected MaterialButton btnCloseBill; // <--- NOVO
+        protected MaterialButton btnCloseBill;
 
         protected override void Dispose(bool disposing)
         {
@@ -36,9 +35,8 @@ namespace Restaurant.App.Others
             this.dgvDetails = new System.Windows.Forms.DataGridView();
             this.lblTotalLabel = new ReaLTaiizor.Controls.MaterialLabel();
             this.lblTotalValue = new ReaLTaiizor.Controls.MaterialLabel();
-            this.btnRefresh = new ReaLTaiizor.Controls.MaterialButton();
             this.btnClose = new ReaLTaiizor.Controls.MaterialButton();
-            this.btnCloseBill = new ReaLTaiizor.Controls.MaterialButton(); // <--- Inicializa
+            this.btnCloseBill = new ReaLTaiizor.Controls.MaterialButton();
 
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -141,16 +139,6 @@ namespace Restaurant.App.Others
             this.btnCloseBill.UseAccentColor = true;
             this.btnCloseBill.Click += new System.EventHandler(this.btnCloseBill_Click);
 
-            // btnRefresh
-            this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRefresh.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnRefresh.Location = new System.Drawing.Point(580, 405);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(100, 36);
-            this.btnRefresh.Text = "Atualizar";
-            this.btnRefresh.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
-
             // btnClose
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
@@ -166,7 +154,6 @@ namespace Restaurant.App.Others
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.btnCloseBill);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.btnRefresh);
             this.Controls.Add(this.btnClose);
             this.Name = "TableMonitorForm";
             this.Text = "Monitoramento de Mesas";

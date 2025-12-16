@@ -9,7 +9,11 @@ namespace Restaurant.Repository.Mapping
         public void Configure(EntityTypeBuilder<Waiter> builder)
         {
             builder.ToTable("Waiters");
+
+            // --- CONFIGURAÇÃO DE ID COM AUTO INCREMENTO ---
             builder.HasKey(w => w.Id);
+            builder.Property(w => w.Id)
+                .ValueGeneratedOnAdd(); // Garante que o banco gere o ID sequencialmente
 
             builder.HasIndex(w => w.Registration)
                 .IsUnique();
@@ -21,7 +25,7 @@ namespace Restaurant.Repository.Mapping
 
             builder.Property(w => w.Registration)
                 .IsRequired()
-                .HasMaxLength(50); 
+                .HasMaxLength(50);
 
             // Relacionamentos
             builder.HasMany(w => w.Orders)

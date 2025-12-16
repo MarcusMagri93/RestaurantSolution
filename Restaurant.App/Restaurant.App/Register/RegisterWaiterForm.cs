@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Linq; // Necessário para calcular o Max()
 using Restaurant.App.Base;
 using Restaurant.App.ViewModel;
 using Restaurant.Domain.Base;
@@ -13,46 +14,70 @@ namespace Restaurant.App.Register
     {
         private readonly IBaseService<Waiter> _waiterService;
 
-        // Injeção de dependência no construtor
         public RegisterWaiterForm(IBaseService<Waiter> waiterService)
         {
             InitializeComponent();
             _waiterService = waiterService;
-
-            // Define a aba inicial como "Cadastro" na primeira carga
             this.tabControlCadastro.SelectedIndex = 0;
         }
 
-        // --- SOLUÇÃO DO PROBLEMA DE TELA ---
-        // Este método roda toda vez que a janela se torna visível (quando você clica no menu).
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
-
-            // Se a janela estiver abrindo (Visible = true)
             if (this.Visible)
             {
-                // Força a aba de Cadastro (índice 0)
                 this.tabControlCadastro.SelectedIndex = 0;
-
-                // Limpa os campos de texto (Nome, Registro, Senha)
                 LimpaCampos();
-
-                // Reseta a flag de edição para garantir que seja um NOVO cadastro
                 IsAlteracao = false;
+
+                // Gera o número automaticamente ao abrir a tela
+                GerarProximoRegistro();
             }
+        }
+
+        // --- NOVA LÓGICA: AUTO-INCREMENTO DO CAMPO REGISTRO ---
+        private void GerarProximoRegistro()
+        {
+            try
+            {
+                var waiters = _waiterService.Get<WaiterViewModel>();
+                int proximoRegistro = 1; // Padrão se não houver ninguém
+
+                if (waiters != null && waiters.Any())
+                {
+                    // Tenta converter os registros existentes para número e pega o maior
+                    int maxRegistro = waiters
+                        .Select(w => int.TryParse(w.Registration, out int n) ? n : 0)
+                        .DefaultIfEmpty(0)
+                        .Max();
+
+                    proximoRegistro = maxRegistro + 1;
+                }
+
+                txtRegistration.Text = proximoRegistro.ToString();
+                txtRegistration.Enabled = false; // Bloqueia para o usuário não mudar
+            }
+            catch
+            {
+                // Fallback de segurança
+                txtRegistration.Text = "1";
+            }
+        }
+
+        protected override void Novo()
+        {
+            base.Novo();
+            // Ao clicar no botão Novo, gera o próximo número
+            GerarProximoRegistro();
         }
 
         protected override void CarregaGrid()
         {
-            // Carrega a lista de garçons para o DataGridView
             dataGridViewConsulta.DataSource = _waiterService.Get<WaiterViewModel>();
         }
 
-        // Método para preencher a Entidade com dados do Formulário
         private void FormToObject(Waiter waiter)
         {
-            // Capturando os campos do formulário
             waiter.Name = txtWaiterName.Text;
             waiter.Registration = txtRegistration.Text;
             waiter.Password = txtPassword.Text;
@@ -63,7 +88,6 @@ namespace Restaurant.App.Register
             var waiter = new Waiter();
             FormToObject(waiter);
 
-            // Se for alteração, o ID deve ser preenchido
             if (IsAlteracao && dataGridViewConsulta.SelectedRows.Count > 0)
             {
                 var selectedId = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
@@ -80,34 +104,29 @@ namespace Restaurant.App.Register
                 else
                 {
                     _waiterService.Add<Waiter, WaiterViewModel, WaiterValidator>(waiter);
-                    MessageBox.Show("Garçom cadastrado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"Garçom cadastrado com sucesso!\nRegistro Gerado: {waiter.Registration}", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 LimpaCampos();
                 CarregaGrid();
-                // Vai para a aba de consulta após salvar com sucesso
-                tabControlCadastro.SelectedIndex = 1;
+
+                // Gera o próximo número para o próximo cadastro imediato
+                GerarProximoRegistro();
             }
             catch (ValidationException vex)
             {
-                // Erros de validação (regras de negócio)
                 var errors = string.Join("\n", vex.Errors);
                 MessageBox.Show(errors, "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                // TRATAMENTO DE DUPLICIDADE
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("Duplicate entry"))
                 {
-                    MessageBox.Show(
-                        "Já existe um garçom cadastrado com este número de Registro.\nPor favor, escolha outro.",
-                        "Registro Duplicado",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Exclamation);
+                    MessageBox.Show("O registro calculado já existe. O sistema tentará gerar um novo.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    GerarProximoRegistro();
                 }
                 else
                 {
-                    // Erro genérico
                     MessageBox.Show($"Erro ao salvar garçom: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -127,6 +146,7 @@ namespace Restaurant.App.Register
             finally
             {
                 CarregaGrid();
+                if (!IsAlteracao) GerarProximoRegistro();
             }
         }
 
@@ -134,10 +154,10 @@ namespace Restaurant.App.Register
         {
             if (linha != null)
             {
-                // Preenche os campos para edição
                 txtWaiterName.Text = linha.Cells["Name"].Value?.ToString();
                 txtRegistration.Text = linha.Cells["Registration"].Value?.ToString();
-                // A senha não é carregada por segurança
+
+                txtRegistration.Enabled = false;
             }
         }
     }

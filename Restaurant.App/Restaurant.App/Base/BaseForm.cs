@@ -12,26 +12,29 @@ namespace Restaurant.App.Base
         public BaseForm()
         {
             InitializeComponent();
-            // Associa o evento de mudança de aba
             tabControlCadastro.SelectedIndexChanged += TabControlCadastro_SelectedIndexChanged;
         }
 
-        // --- Oculta botões na aba de consulta ---
         private void TabControlCadastro_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            // Aba 0 = Cadastro (Botões visíveis)
-            // Aba 1 = Consulta (Botões invisíveis)
             bool isCadastro = tabControlCadastro.SelectedIndex == 0;
-
             btnSalvar.Visible = isCadastro;
             btnCancelar.Visible = isCadastro;
         }
 
+        // ALTERAÇÃO: O clique agora chama um método virtual
         private void btnCancelar_Click(object sender, EventArgs e)
+        {
+            Cancelar();
+        }
+
+        // Método virtual que pode ser sobrescrito pelos filhos
+        protected virtual void Cancelar()
         {
             if (MessageBox.Show(@"Deseja realmente cancelar?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 LimpaCampos();
+                // Comportamento padrão: Vai para a aba de consulta
                 tabControlCadastro.SelectedIndex = 1;
             }
         }

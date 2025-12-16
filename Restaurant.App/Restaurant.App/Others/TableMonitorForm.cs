@@ -29,17 +29,11 @@ namespace Restaurant.App.Others
             }
         }
 
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-            CarregarMonitor();
-        }
-
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        // --- BOTÃO FECHAR CONTA ---
         private void btnCloseBill_Click(object sender, EventArgs e)
         {
             if (dgvTables.SelectedRows.Count == 0)
@@ -57,7 +51,7 @@ namespace Restaurant.App.Others
                 {
                     _orderService.CloseBill(orderId);
                     MessageBox.Show($"Mesa {tableNum} fechada com sucesso!");
-                    CarregarMonitor(); // A mesa paga sumirá da lista
+                    CarregarMonitor();
                 }
                 catch (Exception ex)
                 {

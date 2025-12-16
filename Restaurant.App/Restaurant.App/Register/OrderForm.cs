@@ -52,6 +52,24 @@ namespace Restaurant.App.Register
             }
         }
 
+        // --- SOBRESCRITA DO BOTÃO CANCELAR ---
+        protected override void Cancelar()
+        {
+            if (MessageBox.Show(@"Deseja limpar os campos do pedido?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                // Limpa os campos visuais
+                LimpaCampos();
+
+                // Reseta o estado interno do formulário
+                _currentOrderId = 0;
+                dgvOrderItems.DataSource = null;
+                IsAlteracao = false;
+
+                // ALTERAÇÃO: Força permanecer na aba de cadastro
+                tabControlCadastro.SelectedIndex = 0;
+            }
+        }
+
         private void CarregaCombos()
         {
             var waiters = _waiterService.Get<WaiterViewModel>().ToList();
@@ -99,7 +117,6 @@ namespace Restaurant.App.Register
             }
         }
 
-        // --- NOVA LÓGICA SILENCIOSA ---
         private void CarregarPedidoSeExistir(int tableNumber)
         {
             var pedidoExistente = _orderService.GetOpenOrders()
@@ -107,11 +124,9 @@ namespace Restaurant.App.Register
 
             if (pedidoExistente != null)
             {
-                // Carrega automaticamente sem perguntar
                 _currentOrderId = pedidoExistente.Id;
                 IsAlteracao = true;
 
-                // Preenche visualmente os campos para consistência
                 txtTableNumber.Text = pedidoExistente.TableNumber.ToString();
                 if (pedidoExistente.WaiterId > 0)
                     cmbWaiter.SelectedValue = pedidoExistente.WaiterId;
@@ -138,7 +153,6 @@ namespace Restaurant.App.Register
 
                 int tableNum = int.Parse(txtTableNumber.Text);
 
-                // Verifica silenciosamente
                 if (_currentOrderId == 0) CarregarPedidoSeExistir(tableNum);
 
                 var order = new Order
@@ -188,10 +202,8 @@ namespace Restaurant.App.Register
 
                 int tableNum = int.Parse(txtTableNumber.Text);
 
-                // 1. Tenta recuperar existente (silencioso)
                 if (_currentOrderId == 0) CarregarPedidoSeExistir(tableNum);
 
-                // 2. Se não existia, cria novo agora
                 if (_currentOrderId == 0)
                 {
                     var order = new Order
@@ -207,7 +219,6 @@ namespace Restaurant.App.Register
                     IsAlteracao = true;
                 }
 
-                // 3. Adiciona Item
                 if (cmbProduct.SelectedValue == null)
                 {
                     MessageBox.Show("Selecione um produto.");
