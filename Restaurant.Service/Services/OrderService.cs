@@ -92,42 +92,41 @@ namespace Restaurant.Services.Services
                 order.OrderItems.Add(newItem);
             }
 
-            UpdateOrderTotal(orderId);
+            order.TotalAmount = CalcularTotalLocal(order);
             _repository.Update(order);
         }
 
         public void CloseBill(int orderId)
         {
-            var order = _repository.GetById(orderId);
-            if (order == null) throw new KeyNotFoundException($"Pedido {orderId} não encontrado.");
-
-            UpdateOrderTotal(orderId);
-            order.IsPaid = true;
-            _repository.Update(order);
-        }
-
-        private void UpdateOrderTotal(int orderId)
-        {
+            // Carrega o pedido com os itens inclusos para o cálculo
             var order = _repository.Get()
                 .Include(o => o.OrderItems)
                 .FirstOrDefault(o => o.Id == orderId);
 
-            if (order == null) return;
+            if (order == null) throw new KeyNotFoundException($"Pedido {orderId} não encontrado.");
 
+            // Calcula o total e marca como pago no mesmo objeto
+            order.TotalAmount = CalcularTotalLocal(order);
+            order.IsPaid = true;
+
+            // Salva uma única vez
+            _repository.Update(order);
+        }
+
+        private decimal CalcularTotalLocal(Order order)
+        {
             decimal total = 0;
+            if (order.OrderItems == null) return 0;
 
             foreach (var item in order.OrderItems)
             {
                 var product = _productRepository.GetById(item.ProductId);
                 if (product != null)
                 {
-                    decimal itemPrice = Convert.ToDecimal(product.Price);
-                    total += item.Quantity * itemPrice;
+                    total += item.Quantity * (decimal)product.Price;
                 }
             }
-
-            order.TotalAmount = total;
-            _repository.Update(order);
+            return total;
         }
 
         public Order GetOrder(int orderId)

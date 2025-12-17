@@ -9,11 +9,12 @@ namespace Restaurant.App.Base
 
         // DECLARAÇÃO CORRIGIDA: Usando System.Windows.Forms.TabPage
         protected MaterialTabControl tabControlCadastro;
-        protected System.Windows.Forms.TabPage tabPageCadastro; // <--- CORRIGIDO
-        protected System.Windows.Forms.TabPage tabPageConsulta; // <--- CORRIGIDO
+        protected System.Windows.Forms.TabPage tabPageCadastro; 
+        protected System.Windows.Forms.TabPage tabPageConsulta; 
         protected DataGridView dataGridViewConsulta;
         protected MaterialButton btnSalvar;
         protected MaterialButton btnCancelar;
+        protected ReaLTaiizor.Controls.MaterialButton btnExcluir;
 
 
         protected override void Dispose(bool disposing)
@@ -137,6 +138,24 @@ namespace Restaurant.App.Base
             ((System.ComponentModel.ISupportInitialize)dataGridViewConsulta).EndInit();
             ResumeLayout(false);
             PerformLayout();
+
+            // Botão DELETE
+
+            this.btnExcluir = new ReaLTaiizor.Controls.MaterialButton();
+
+            // Configurações do botão
+            this.btnExcluir.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.btnExcluir.Text = "EXCLUIR";
+            this.btnExcluir.Type = MaterialButton.MaterialButtonType.Contained;
+            this.btnExcluir.UseAccentColor = true;
+            this.btnExcluir.Location = new Point(500, 400); // Exemplo de posição
+            this.btnExcluir.Name = "btnExcluir";
+
+            // Vincula o evento de clique que já existe no BaseForm.cs
+            this.btnExcluir.Click += new System.EventHandler(this.btnExcluir_Click);
+
+            // ADICIONA O BOTÃO NA TAB DE CONSULTA
+            this.tabPageConsulta.Controls.Add(this.btnExcluir);
 
         }
 
