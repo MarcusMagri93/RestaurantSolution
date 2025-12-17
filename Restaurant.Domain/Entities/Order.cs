@@ -10,6 +10,8 @@ namespace Restaurant.Domain.Entities
         public int TableNumber { get; set; }
         public double TotalValue { get; set; } 
 
+        public DateTime OrderDate { get; set; } = DateTime.Now; // Data e Hora do Pedido
+
         // Chaves Estrangeiras
         public int WaiterId { get; set; }
 

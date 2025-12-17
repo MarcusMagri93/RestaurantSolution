@@ -138,7 +138,16 @@ namespace Restaurant.Services.Services
                 .FirstOrDefault(o => o.Id == orderId);
         }
 
-        public double GetTotalRevenue(DateTime date) => (double)_repository.Get().Sum(o => o.TotalAmount);
+        public double GetTotalRevenue(DateTime date)
+        {
+            // Define o início e o fim do dia para uma busca precisa no banco
+            var inicioDia = date.Date;
+            var fimDia = inicioDia.AddDays(1);
+
+            return (double)_repository.Get()
+                .Where(o => o.IsPaid && o.OrderDate >= inicioDia && o.OrderDate < fimDia)
+                .Sum(o => o.TotalAmount);
+        }
         public IList<Order> GetOpenOrders() => _repository.Get().Where(o => !o.IsPaid).ToList();
     }
 }

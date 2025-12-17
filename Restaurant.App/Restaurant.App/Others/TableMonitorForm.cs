@@ -86,6 +86,9 @@ namespace Restaurant.App.Others
                     dgvDetails.DataSource = null;
                     lblTotalValue.Text = "R$ 0,00";
                 }
+
+                decimal revenue = (decimal)_orderService.GetTotalRevenue(DateTime.Today); 
+                lblDailyRevenue.Text = $"Total do Dia: {revenue.ToString("C2")}";
             }
             catch (Exception ex)
             {

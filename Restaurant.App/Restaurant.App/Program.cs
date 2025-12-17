@@ -36,10 +36,9 @@ namespace Restaurant.App
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            // CORRIGIDO: Chamando o novo nome do método de extensão
+            //Chamando o novo nome do método de extensão
             services.ConfigureApplicationServices();
 
-            // Registra Formulários (Views) - DI
 
             // Singleton: O formulário principal (Menu)
             services.AddSingleton<MainForm>();

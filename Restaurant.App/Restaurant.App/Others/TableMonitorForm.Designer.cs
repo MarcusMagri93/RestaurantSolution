@@ -28,149 +28,228 @@ namespace Restaurant.App.Others
 
         private void InitializeComponent()
         {
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.grpMesas = new System.Windows.Forms.GroupBox();
-            this.dgvTables = new System.Windows.Forms.DataGridView();
-            this.grpDetalhes = new System.Windows.Forms.GroupBox();
-            this.dgvDetails = new System.Windows.Forms.DataGridView();
-            this.lblTotalLabel = new ReaLTaiizor.Controls.MaterialLabel();
-            this.lblTotalValue = new ReaLTaiizor.Controls.MaterialLabel();
-            this.btnClose = new ReaLTaiizor.Controls.MaterialButton();
-            this.btnCloseBill = new ReaLTaiizor.Controls.MaterialButton();
-
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.grpMesas.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvTables)).BeginInit();
-            this.grpDetalhes.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvDetails)).BeginInit();
-            this.SuspendLayout();
-
+            splitContainer1 = new SplitContainer();
+            grpMesas = new System.Windows.Forms.GroupBox();
+            dgvTables = new DataGridView();
+            grpDetalhes = new System.Windows.Forms.GroupBox();
+            dgvDetails = new DataGridView();
+            lblTotalLabel = new MaterialLabel();
+            lblTotalValue = new MaterialLabel();
+            btnClose = new MaterialButton();
+            btnCloseBill = new MaterialButton();
+            lblDailyRevenue = new MaterialButton();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
+            grpMesas.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvTables).BeginInit();
+            grpDetalhes.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvDetails).BeginInit();
+            SuspendLayout();
+            // 
             // splitContainer1
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(6, 70);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Panel1.Controls.Add(this.grpMesas);
-            this.splitContainer1.Panel2.Controls.Add(this.grpDetalhes);
-            this.splitContainer1.Panel2.Controls.Add(this.lblTotalLabel);
-            this.splitContainer1.Panel2.Controls.Add(this.lblTotalValue);
-            this.splitContainer1.Size = new System.Drawing.Size(788, 320);
-            this.splitContainer1.SplitterDistance = 300;
-            this.splitContainer1.TabIndex = 0;
-
+            // 
+            splitContainer1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            splitContainer1.Location = new Point(7, 93);
+            splitContainer1.Margin = new Padding(3, 4, 3, 4);
+            splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(grpMesas);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(grpDetalhes);
+            splitContainer1.Panel2.Controls.Add(lblTotalLabel);
+            splitContainer1.Panel2.Controls.Add(lblTotalValue);
+            splitContainer1.Size = new Size(901, 427);
+            splitContainer1.SplitterDistance = 343;
+            splitContainer1.SplitterWidth = 5;
+            splitContainer1.TabIndex = 0;
+            // 
             // grpMesas
-            this.grpMesas.Controls.Add(this.dgvTables);
-            this.grpMesas.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpMesas.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.grpMesas.Location = new System.Drawing.Point(0, 0);
-            this.grpMesas.Name = "grpMesas";
-            this.grpMesas.Size = new System.Drawing.Size(300, 320);
-            this.grpMesas.TabIndex = 0;
-            this.grpMesas.TabStop = false;
-            this.grpMesas.Text = "Mesas Abertas";
-
+            // 
+            grpMesas.Controls.Add(dgvTables);
+            grpMesas.Dock = DockStyle.Fill;
+            grpMesas.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            grpMesas.Location = new Point(0, 0);
+            grpMesas.Margin = new Padding(3, 4, 3, 4);
+            grpMesas.Name = "grpMesas";
+            grpMesas.Padding = new Padding(3, 4, 3, 4);
+            grpMesas.Size = new Size(343, 427);
+            grpMesas.TabIndex = 0;
+            grpMesas.TabStop = false;
+            grpMesas.Text = "Mesas Abertas";
+            // 
             // dgvTables
-            this.dgvTables.AllowUserToAddRows = false;
-            this.dgvTables.AllowUserToDeleteRows = false;
-            this.dgvTables.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvTables.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvTables.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvTables.Location = new System.Drawing.Point(3, 21);
-            this.dgvTables.MultiSelect = false;
-            this.dgvTables.Name = "dgvTables";
-            this.dgvTables.ReadOnly = true;
-            this.dgvTables.RowHeadersVisible = false;
-            this.dgvTables.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvTables.Size = new System.Drawing.Size(294, 296);
-            this.dgvTables.TabIndex = 0;
-
+            // 
+            dgvTables.AllowUserToAddRows = false;
+            dgvTables.AllowUserToDeleteRows = false;
+            dgvTables.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvTables.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvTables.Dock = DockStyle.Fill;
+            dgvTables.Location = new Point(3, 27);
+            dgvTables.Margin = new Padding(3, 4, 3, 4);
+            dgvTables.MultiSelect = false;
+            dgvTables.Name = "dgvTables";
+            dgvTables.ReadOnly = true;
+            dgvTables.RowHeadersVisible = false;
+            dgvTables.RowHeadersWidth = 51;
+            dgvTables.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvTables.Size = new Size(337, 396);
+            dgvTables.TabIndex = 0;
+            // 
             // grpDetalhes
-            this.grpDetalhes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpDetalhes.Controls.Add(this.dgvDetails);
-            this.grpDetalhes.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.grpDetalhes.Location = new System.Drawing.Point(3, 0);
-            this.grpDetalhes.Name = "grpDetalhes";
-            this.grpDetalhes.Size = new System.Drawing.Size(478, 260);
-            this.grpDetalhes.TabIndex = 0;
-            this.grpDetalhes.TabStop = false;
-            this.grpDetalhes.Text = "Consumo da Mesa";
-
+            // 
+            grpDetalhes.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            grpDetalhes.Controls.Add(dgvDetails);
+            grpDetalhes.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            grpDetalhes.Location = new Point(3, 0);
+            grpDetalhes.Margin = new Padding(3, 4, 3, 4);
+            grpDetalhes.Name = "grpDetalhes";
+            grpDetalhes.Padding = new Padding(3, 4, 3, 4);
+            grpDetalhes.Size = new Size(543, 347);
+            grpDetalhes.TabIndex = 0;
+            grpDetalhes.TabStop = false;
+            grpDetalhes.Text = "Consumo da Mesa";
+            // 
             // dgvDetails
-            this.dgvDetails.AllowUserToAddRows = false;
-            this.dgvDetails.AllowUserToDeleteRows = false;
-            this.dgvDetails.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvDetails.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDetails.Location = new System.Drawing.Point(3, 21);
-            this.dgvDetails.Name = "dgvDetails";
-            this.dgvDetails.ReadOnly = true;
-            this.dgvDetails.RowHeadersVisible = false;
-            this.dgvDetails.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvDetails.Size = new System.Drawing.Size(472, 236);
-            this.dgvDetails.TabIndex = 0;
-
-            // Labels e Botões
-            this.lblTotalLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblTotalLabel.AutoSize = true;
-            this.lblTotalLabel.Location = new System.Drawing.Point(250, 275);
-            this.lblTotalLabel.Name = "lblTotalLabel";
-            this.lblTotalLabel.Size = new System.Drawing.Size(107, 19);
-            this.lblTotalLabel.Text = "Total da Mesa:";
-
-            this.lblTotalValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblTotalValue.AutoSize = true;
-            this.lblTotalValue.Font = new System.Drawing.Font("Roboto Medium", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
-            this.lblTotalValue.Location = new System.Drawing.Point(370, 270);
-            this.lblTotalValue.Name = "lblTotalValue";
-            this.lblTotalValue.Size = new System.Drawing.Size(71, 24);
-            this.lblTotalValue.Text = "R$ 0,00";
-
-            // btnCloseBill
-            this.btnCloseBill.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCloseBill.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnCloseBill.Location = new System.Drawing.Point(440, 405);
-            this.btnCloseBill.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.btnCloseBill.Name = "btnCloseBill";
-            this.btnCloseBill.Size = new System.Drawing.Size(130, 36);
-            this.btnCloseBill.Text = "FECHAR MESA";
-            this.btnCloseBill.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.btnCloseBill.UseAccentColor = true;
-            this.btnCloseBill.Click += new System.EventHandler(this.btnCloseBill_Click);
-
+            // 
+            dgvDetails.AllowUserToAddRows = false;
+            dgvDetails.AllowUserToDeleteRows = false;
+            dgvDetails.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvDetails.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvDetails.Dock = DockStyle.Fill;
+            dgvDetails.Location = new Point(3, 27);
+            dgvDetails.Margin = new Padding(3, 4, 3, 4);
+            dgvDetails.Name = "dgvDetails";
+            dgvDetails.ReadOnly = true;
+            dgvDetails.RowHeadersVisible = false;
+            dgvDetails.RowHeadersWidth = 51;
+            dgvDetails.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvDetails.Size = new Size(537, 316);
+            dgvDetails.TabIndex = 0;
+            // 
+            // lblTotalLabel
+            // 
+            lblTotalLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            lblTotalLabel.AutoSize = true;
+            lblTotalLabel.Depth = 0;
+            lblTotalLabel.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblTotalLabel.Location = new Point(283, 367);
+            lblTotalLabel.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            lblTotalLabel.Name = "lblTotalLabel";
+            lblTotalLabel.Size = new Size(107, 19);
+            lblTotalLabel.TabIndex = 1;
+            lblTotalLabel.Text = "Total da Mesa:";
+            // 
+            // lblTotalValue
+            // 
+            lblTotalValue.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            lblTotalValue.AutoSize = true;
+            lblTotalValue.Depth = 0;
+            lblTotalValue.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblTotalValue.Location = new Point(420, 360);
+            lblTotalValue.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            lblTotalValue.Name = "lblTotalValue";
+            lblTotalValue.Size = new Size(54, 19);
+            lblTotalValue.TabIndex = 2;
+            lblTotalValue.Text = "R$ 0,00";
+            // 
             // btnClose
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnClose.Location = new System.Drawing.Point(690, 405);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(80, 36);
-            this.btnClose.Text = "Sair";
-            this.btnClose.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Outlined;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
-
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.btnCloseBill);
-            this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.btnClose);
-            this.Name = "TableMonitorForm";
-            this.Text = "Monitoramento de Mesas";
-
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            this.splitContainer1.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.grpMesas.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvTables)).EndInit();
-            this.grpDetalhes.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvDetails)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            // 
+            btnClose.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnClose.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnClose.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnClose.Depth = 0;
+            btnClose.HighEmphasis = true;
+            btnClose.Icon = null;
+            btnClose.IconType = MaterialButton.MaterialIconType.Rebase;
+            btnClose.Location = new Point(816, 552);
+            btnClose.Margin = new Padding(5, 8, 5, 8);
+            btnClose.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnClose.Name = "btnClose";
+            btnClose.NoAccentTextColor = Color.Empty;
+            btnClose.Size = new Size(64, 36);
+            btnClose.TabIndex = 1;
+            btnClose.Text = "Sair";
+            btnClose.Type = MaterialButton.MaterialButtonType.Outlined;
+            btnClose.UseAccentColor = false;
+            btnClose.Click += btnClose_Click;
+            // 
+            // btnCloseBill
+            // 
+            btnCloseBill.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCloseBill.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnCloseBill.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnCloseBill.Depth = 0;
+            btnCloseBill.HighEmphasis = true;
+            btnCloseBill.Icon = null;
+            btnCloseBill.IconType = MaterialButton.MaterialIconType.Rebase;
+            btnCloseBill.Location = new Point(444, 552);
+            btnCloseBill.Margin = new Padding(5, 8, 5, 8);
+            btnCloseBill.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnCloseBill.Name = "btnCloseBill";
+            btnCloseBill.NoAccentTextColor = Color.Empty;
+            btnCloseBill.Size = new Size(120, 36);
+            btnCloseBill.TabIndex = 0;
+            btnCloseBill.Text = "FECHAR MESA";
+            btnCloseBill.Type = MaterialButton.MaterialButtonType.Contained;
+            btnCloseBill.UseAccentColor = true;
+            btnCloseBill.Click += btnCloseBill_Click;
+            // 
+            // lblDailyRevenue
+            // 
+            lblDailyRevenue.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            lblDailyRevenue.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            lblDailyRevenue.Density = MaterialButton.MaterialButtonDensity.Default;
+            lblDailyRevenue.Depth = 0;
+            lblDailyRevenue.HighEmphasis = true;
+            lblDailyRevenue.Icon = null;
+            lblDailyRevenue.IconType = MaterialButton.MaterialIconType.Rebase;
+            lblDailyRevenue.Location = new Point(604, 552);
+            lblDailyRevenue.Margin = new Padding(5, 8, 5, 8);
+            lblDailyRevenue.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            lblDailyRevenue.Name = "lblDailyRevenue";
+            lblDailyRevenue.NoAccentTextColor = Color.Empty;
+            lblDailyRevenue.Size = new Size(174, 36);
+            lblDailyRevenue.TabIndex = 2;
+            lblDailyRevenue.Text = "TOTAL DO DIA: R$ 0,00";
+            lblDailyRevenue.Type = MaterialButton.MaterialButtonType.Contained;
+            lblDailyRevenue.UseAccentColor = true;
+            // 
+            // TableMonitorForm
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(914, 600);
+            Controls.Add(lblDailyRevenue);
+            Controls.Add(btnCloseBill);
+            Controls.Add(splitContainer1);
+            Controls.Add(btnClose);
+            Margin = new Padding(3, 4, 3, 4);
+            Name = "TableMonitorForm";
+            Padding = new Padding(3, 85, 3, 4);
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Monitoramento de Mesas";
+            WindowState = FormWindowState.Maximized;
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel2.ResumeLayout(false);
+            splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
+            grpMesas.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvTables).EndInit();
+            grpDetalhes.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvDetails).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
+
+        protected MaterialButton lblDailyRevenue;
     }
 }
