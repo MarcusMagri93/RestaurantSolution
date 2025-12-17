@@ -20,6 +20,7 @@ namespace Restaurant.App.Base
             bool isCadastro = tabControlCadastro.SelectedIndex == 0;
             btnSalvar.Visible = isCadastro;
             btnCancelar.Visible = isCadastro;
+            btnExcluir.Visible = !isCadastro;
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
