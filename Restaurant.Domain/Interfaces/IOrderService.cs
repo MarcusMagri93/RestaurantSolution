@@ -18,7 +18,7 @@ namespace Restaurant.Domain.Interfaces.Base
         // Busca TODOS os pedidos (histórico completo) com detalhes
         IList<TOutputModel> GetAllWithDetails<TOutputModel>() where TOutputModel : class;
 
-        // NOVO: Busca APENAS os pedidos em aberto (Mesas Ativas) com detalhes
+        // Busca APENAS os pedidos em aberto (Mesas Ativas) com detalhes
         IList<TOutputModel> GetOpenOrdersWithDetails<TOutputModel>() where TOutputModel : class;
     }
 }

@@ -38,7 +38,6 @@ namespace Restaurant.Services.Services
             return _mapper.Map<IList<TOutputModel>>(orders);
         }
 
-        // NOVO: Busca apenas mesas ativas com detalhes
         public IList<TOutputModel> GetOpenOrdersWithDetails<TOutputModel>() where TOutputModel : class
         {
             var orders = _repository.Get()

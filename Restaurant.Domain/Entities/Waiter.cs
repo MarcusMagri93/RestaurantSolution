@@ -6,8 +6,8 @@ namespace Restaurant.Domain.Entities
     public class Waiter : BaseEntity<int> 
     {
         public string Name { get; set; } = default!;
-        public string Registration { get; set; } = default!; // Matrícula ou código de acesso
-        public string Password { get; set; } = default!; // Propriedade já inicializada
+        public string Registration { get; set; } = default!; 
+        public string Password { get; set; } = default!; 
 
         public ICollection<Order> Orders { get; set; } = new List<Order>();
 

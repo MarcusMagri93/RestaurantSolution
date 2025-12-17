@@ -4,7 +4,6 @@
     {
         public int Volume { get; set; }
 
-        // Construtor Vazio (Padrão do Professor)
         public Drink()
         {
         }

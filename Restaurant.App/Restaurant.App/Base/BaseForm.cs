@@ -22,19 +22,16 @@ namespace Restaurant.App.Base
             btnCancelar.Visible = isCadastro;
         }
 
-        // ALTERAÇÃO: O clique agora chama um método virtual
         private void btnCancelar_Click(object sender, EventArgs e)
         {
             Cancelar();
         }
 
-        // Método virtual que pode ser sobrescrito pelos filhos
         protected virtual void Cancelar()
         {
             if (MessageBox.Show(@"Deseja realmente cancelar?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 LimpaCampos();
-                // Comportamento padrão: Vai para a aba de consulta
                 tabControlCadastro.SelectedIndex = 1;
             }
         }

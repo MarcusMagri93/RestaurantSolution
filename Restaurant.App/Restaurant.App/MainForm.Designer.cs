@@ -26,69 +26,130 @@ namespace Restaurant.App
 
         private void InitializeComponent()
         {
-            this.btnMenuProduct = new ReaLTaiizor.Controls.MaterialButton();
-            this.btnMenuListProducts = new ReaLTaiizor.Controls.MaterialButton();
-            this.btnMenuWaiter = new ReaLTaiizor.Controls.MaterialButton();
-            this.btnMenuOrder = new ReaLTaiizor.Controls.MaterialButton();
-            this.btnMonitor = new ReaLTaiizor.Controls.MaterialButton();
-
-            this.SuspendLayout();
-
+            btnMenuProduct = new MaterialButton();
+            btnMenuListProducts = new MaterialButton();
+            btnMenuWaiter = new MaterialButton();
+            btnMenuOrder = new MaterialButton();
+            btnMonitor = new MaterialButton();
+            SuspendLayout();
             // 
             // btnMenuProduct
             // 
-            this.btnMenuProduct.Text = "Cadastrar Produtos";
-            this.btnMenuProduct.Location = new Point(20, 100);
-            this.btnMenuProduct.Size = new Size(200, 40);
-            this.btnMenuProduct.Click += new System.EventHandler(this.MenuProduct_Click);
-            this.Controls.Add(this.btnMenuProduct);
-
+            btnMenuProduct.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnMenuProduct.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnMenuProduct.Depth = 0;
+            btnMenuProduct.HighEmphasis = true;
+            btnMenuProduct.Icon = null;
+            btnMenuProduct.IconType = MaterialButton.MaterialIconType.Rebase;
+            btnMenuProduct.Location = new Point(20, 125);
+            btnMenuProduct.Margin = new Padding(4, 8, 4, 8);
+            btnMenuProduct.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnMenuProduct.Name = "btnMenuProduct";
+            btnMenuProduct.NoAccentTextColor = Color.Empty;
+            btnMenuProduct.Size = new Size(185, 36);
+            btnMenuProduct.TabIndex = 0;
+            btnMenuProduct.Text = "Cadastrar Produtos";
+            btnMenuProduct.Type = MaterialButton.MaterialButtonType.Contained;
+            btnMenuProduct.UseAccentColor = false;
+            btnMenuProduct.Click += MenuProduct_Click;
             // 
             // btnMenuListProducts
             // 
-            this.btnMenuListProducts.Text = "Listar Produtos";
-            this.btnMenuListProducts.Location = new Point(240, 100);
-            this.btnMenuListProducts.Size = new Size(200, 40);
-            this.btnMenuListProducts.Click += new System.EventHandler(this.MenuListProducts_Click);
-            this.Controls.Add(this.btnMenuListProducts);
-
+            btnMenuListProducts.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnMenuListProducts.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnMenuListProducts.Depth = 0;
+            btnMenuListProducts.HighEmphasis = true;
+            btnMenuListProducts.Icon = null;
+            btnMenuListProducts.IconType = MaterialButton.MaterialIconType.Rebase;
+            btnMenuListProducts.Location = new Point(240, 125);
+            btnMenuListProducts.Margin = new Padding(4, 8, 4, 8);
+            btnMenuListProducts.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnMenuListProducts.Name = "btnMenuListProducts";
+            btnMenuListProducts.NoAccentTextColor = Color.Empty;
+            btnMenuListProducts.Size = new Size(150, 36);
+            btnMenuListProducts.TabIndex = 1;
+            btnMenuListProducts.Text = "Listar Produtos";
+            btnMenuListProducts.Type = MaterialButton.MaterialButtonType.Contained;
+            btnMenuListProducts.UseAccentColor = false;
+            btnMenuListProducts.Click += MenuListProducts_Click;
             // 
             // btnMenuWaiter
             // 
-            this.btnMenuWaiter.Text = "Cadastrar Garçons";
-            this.btnMenuWaiter.Location = new Point(20, 160);
-            this.btnMenuWaiter.Size = new Size(200, 40);
-            this.btnMenuWaiter.Click += new System.EventHandler(this.MenuWaiter_Click);
-            this.Controls.Add(this.btnMenuWaiter);
-
+            btnMenuWaiter.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnMenuWaiter.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnMenuWaiter.Depth = 0;
+            btnMenuWaiter.HighEmphasis = true;
+            btnMenuWaiter.Icon = null;
+            btnMenuWaiter.IconType = MaterialButton.MaterialIconType.Rebase;
+            btnMenuWaiter.Location = new Point(20, 200);
+            btnMenuWaiter.Margin = new Padding(4, 8, 4, 8);
+            btnMenuWaiter.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnMenuWaiter.Name = "btnMenuWaiter";
+            btnMenuWaiter.NoAccentTextColor = Color.Empty;
+            btnMenuWaiter.Size = new Size(178, 36);
+            btnMenuWaiter.TabIndex = 2;
+            btnMenuWaiter.Text = "Cadastrar Garçons";
+            btnMenuWaiter.Type = MaterialButton.MaterialButtonType.Contained;
+            btnMenuWaiter.UseAccentColor = false;
+            btnMenuWaiter.Click += MenuWaiter_Click;
             // 
             // btnMenuOrder
             // 
-            this.btnMenuOrder.Text = "Gerenciar Pedidos";
-            this.btnMenuOrder.Location = new Point(20, 220);
-            this.btnMenuOrder.Size = new Size(200, 40);
-            this.btnMenuOrder.Click += new System.EventHandler(this.MenuOrder_Click);
-            this.Controls.Add(this.btnMenuOrder);
-
+            btnMenuOrder.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnMenuOrder.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnMenuOrder.Depth = 0;
+            btnMenuOrder.HighEmphasis = true;
+            btnMenuOrder.Icon = null;
+            btnMenuOrder.IconType = MaterialButton.MaterialIconType.Rebase;
+            btnMenuOrder.Location = new Point(20, 275);
+            btnMenuOrder.Margin = new Padding(4, 8, 4, 8);
+            btnMenuOrder.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnMenuOrder.Name = "btnMenuOrder";
+            btnMenuOrder.NoAccentTextColor = Color.Empty;
+            btnMenuOrder.Size = new Size(165, 36);
+            btnMenuOrder.TabIndex = 3;
+            btnMenuOrder.Text = "Gerenciar Pedidos";
+            btnMenuOrder.Type = MaterialButton.MaterialButtonType.Contained;
+            btnMenuOrder.UseAccentColor = false;
+            btnMenuOrder.Click += MenuOrder_Click;
             // 
-            // btnMonitor (NOVO)
+            // btnMonitor
             // 
-            this.btnMonitor.Text = "Monitorar Mesas";
-            this.btnMonitor.Location = new Point(20, 280); // Abaixo de Pedidos
-            this.btnMonitor.Size = new Size(200, 40);
-            this.btnMonitor.Click += new System.EventHandler(this.btnMonitor_Click);
-            this.Controls.Add(this.btnMonitor);
-
+            btnMonitor.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnMonitor.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnMonitor.Depth = 0;
+            btnMonitor.HighEmphasis = true;
+            btnMonitor.Icon = null;
+            btnMonitor.IconType = MaterialButton.MaterialIconType.Rebase;
+            btnMonitor.Location = new Point(20, 350);
+            btnMonitor.Margin = new Padding(4, 8, 4, 8);
+            btnMonitor.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnMonitor.Name = "btnMonitor";
+            btnMonitor.NoAccentTextColor = Color.Empty;
+            btnMonitor.Size = new Size(158, 36);
+            btnMonitor.TabIndex = 4;
+            btnMonitor.Text = "Monitorar Mesas";
+            btnMonitor.Type = MaterialButton.MaterialButtonType.Contained;
+            btnMonitor.UseAccentColor = false;
+            btnMonitor.Click += btnMonitor_Click;
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new SizeF(8F, 16F);
-            this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(800, 600);
-            this.Text = "Menu Principal";
-
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 750);
+            Controls.Add(btnMenuProduct);
+            Controls.Add(btnMenuListProducts);
+            Controls.Add(btnMenuWaiter);
+            Controls.Add(btnMenuOrder);
+            Controls.Add(btnMonitor);
+            Margin = new Padding(3, 4, 3, 4);
+            Name = "MainForm";
+            Padding = new Padding(3, 80, 3, 4);
+            Text = "Menu Principal";
+            WindowState = FormWindowState.Maximized;
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

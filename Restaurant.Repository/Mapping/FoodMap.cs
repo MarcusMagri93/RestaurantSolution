@@ -17,7 +17,7 @@ namespace Restaurant.Repository.Mapping
             // Ingredientes: Define um tamanho máximo para não ficar como 'longtext' desnecessariamente
             builder.Property(f => f.Ingredients)
                 .HasMaxLength(500)
-                .IsRequired(false); // Pode ser opcional dependendo da sua regra de negócio
+                .IsRequired(false);
+            }
         }
     }
-}

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Restaurant.Domain.Entities; // Garanta que este using está correto
+using Restaurant.Domain.Entities; 
 
 namespace Restaurant.Services.Validators
 {

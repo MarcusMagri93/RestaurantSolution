@@ -1,28 +1,25 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using Restaurant.Domain.Base; // NOVO: Referencia o IBaseService e IBaseRepository
+using Restaurant.Domain.Base; 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Restaurant.Services.Services.Base
 {
-    // A implementação DEVE ter a restrição WHERE para satisfazer a injeção do IBaseRepository
     public class BaseService<TEntity> : IBaseService<TEntity>
-        where TEntity : BaseEntity<int> // <--- RESTRIÇÃO ESSENCIAL
+        where TEntity : BaseEntity<int> 
     {
-        // Nota: IBaseRepository está no namespace Restaurant.Domain.Base
         protected readonly IBaseRepository<TEntity> _repository;
         protected readonly IMapper _mapper;
 
-        // O construtor injeta o Repositório e o AutoMapper
         public BaseService(IBaseRepository<TEntity> repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
         }
 
-        // ... (Implementação dos métodos CRUD, Get, Update, Delete)
+     // Implementação dos métodos CRUD, Get, Update, Delete)
 
         public TOutputModel Add<TInputModel, TOutputModel, TValidator>(TInputModel inputModel)
             where TInputModel : class
@@ -39,9 +36,6 @@ namespace Restaurant.Services.Services.Base
             _repository.Add(entity);
             return _mapper.Map<TOutputModel>(entity);
         }
-
-        // ... (Implementação completa do CRUD como fornecido anteriormente)
-        // [Os outros métodos devem ser copiados da versão anterior do BaseService.cs que te forneci]
 
         public TOutputModel Update<TInputModel, TOutputModel, TValidator>(TInputModel inputModel)
             where TInputModel : class

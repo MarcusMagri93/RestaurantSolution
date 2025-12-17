@@ -1,5 +1,4 @@
-﻿// Restaurant.Service/Services/ProductService.cs
-using AutoMapper;
+﻿using AutoMapper;
 using Restaurant.Domain.Base;
 using Restaurant.Domain.Entities;
 using Restaurant.Domain.Interfaces;

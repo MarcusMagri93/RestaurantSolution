@@ -24,7 +24,6 @@ namespace Restaurant.Repository.Repositories.Base
             {
                 _dbSet.Add(obj);
                 _context.SaveChanges();
-                // CORREÇÃO: Remove o objeto da memória após salvar para evitar conflitos
                 _context.Entry(obj).State = EntityState.Detached;
             }
             catch (Exception)
@@ -46,7 +45,6 @@ namespace Restaurant.Repository.Repositories.Base
 
                 _dbSet.Update(obj);
                 _context.SaveChanges();
-                // CORREÇÃO: Remove o objeto da memória após atualizar
                 _context.Entry(obj).State = EntityState.Detached;
             }
             catch (Exception)

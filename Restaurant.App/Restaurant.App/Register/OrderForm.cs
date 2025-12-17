@@ -65,7 +65,7 @@ namespace Restaurant.App.Register
                 dgvOrderItems.DataSource = null;
                 IsAlteracao = false;
 
-                // ALTERAÇÃO: Força permanecer na aba de cadastro
+                //Força permanecer na aba de cadastro
                 tabControlCadastro.SelectedIndex = 0;
             }
         }
