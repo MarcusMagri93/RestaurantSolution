@@ -18,8 +18,12 @@ namespace Restaurant.App.Base
         private void TabControlCadastro_SelectedIndexChanged(object? sender, EventArgs e)
         {
             bool isCadastro = tabControlCadastro.SelectedIndex == 0;
+
+            // O botão Salvar e Cancelar aparecem apenas na aba de Cadastro
             btnSalvar.Visible = isCadastro;
             btnCancelar.Visible = isCadastro;
+
+            // O botão Excluir aparece apenas na aba de Consulta
             btnExcluir.Visible = !isCadastro;
         }
 
@@ -42,21 +46,11 @@ namespace Restaurant.App.Base
             Salvar();
         }
 
-        private void btnNovo_Click(object sender, EventArgs e)
-        {
-            Novo();
-        }
-
-        private void btnEditar_Click(object sender, EventArgs e)
-        {
-            Editar();
-        }
-
         private void btnExcluir_Click(object sender, EventArgs e)
         {
             if (dataGridViewConsulta.SelectedRows.Count > 0)
             {
-                if (MessageBox.Show(@"Deseja realmente excluir?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show(@"Deseja realmente excluir este registro?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     int id = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
                     Deletar(id);
@@ -65,7 +59,7 @@ namespace Restaurant.App.Base
             }
             else
             {
-                MessageBox.Show(@"Selecione algum registro!", @"Restaurant App", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(@"Selecione um registro na lista para excluir!", @"Restaurant App", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -73,6 +67,7 @@ namespace Restaurant.App.Base
         {
             CarregaGrid();
         }
+
         private void dataGridViewConsulta_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             Editar();
@@ -81,7 +76,7 @@ namespace Restaurant.App.Base
         protected void LimpaCampos()
         {
             IsAlteracao = false;
-            foreach (var control in tabPageCadastro.Controls)
+            foreach (Control control in tabPageCadastro.Controls)
             {
                 if (control is MaterialTextBoxEdit materialTextBoxEdit) materialTextBoxEdit.Clear();
                 if (control is MaterialMaskedTextBox materialMaskedTextBox) materialMaskedTextBox.Clear();
@@ -89,13 +84,16 @@ namespace Restaurant.App.Base
         }
 
         protected virtual void CarregaGrid() { }
+
         protected virtual void Novo()
         {
             LimpaCampos();
             tabControlCadastro.SelectedIndex = 0;
             tabControlCadastro.Focus();
         }
+
         protected virtual void Salvar() { }
+
         protected virtual void Editar()
         {
             if (dataGridViewConsulta.SelectedRows.Count > 0)
@@ -111,7 +109,9 @@ namespace Restaurant.App.Base
                 MessageBox.Show(@"Selecione algum registro!", @"Restaurant App", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
         protected virtual void Deletar(int id) { }
+
         protected virtual void CarregaRegistro(DataGridViewRow? linha) { }
     }
 }

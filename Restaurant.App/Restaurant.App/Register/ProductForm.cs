@@ -179,11 +179,22 @@ namespace Restaurant.App.Register
             try
             {
                 _productService.Delete(id);
-                MessageBox.Show("Produto excluído!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Produto excluído com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao excluir: {ex.Message}");
+                // Verifica se o erro é de violação de chave estrangeira (produto sendo usado)
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE statement conflicted"))
+                {
+                    MessageBox.Show("Não é possível excluir este produto pois ele já foi vendido em pedidos anteriores. " +
+                                    "Para removê-lo do cardápio, considere desativá-lo.",
+                                    "Bloqueio de Exclusão", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show($"Não foi possível excluir o produto. Verifique se ele possui vendas vinculadas.\nDetalhes: {ex.Message}",
+                                    "Erro ao Excluir", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             finally
             {
