@@ -110,7 +110,7 @@ namespace Restaurant.App.Others
             grpDetalhes.Margin = new Padding(3, 4, 3, 4);
             grpDetalhes.Name = "grpDetalhes";
             grpDetalhes.Padding = new Padding(3, 4, 3, 4);
-            grpDetalhes.Size = new Size(542, 347);
+            grpDetalhes.Size = new Size(539, 347);
             grpDetalhes.TabIndex = 0;
             grpDetalhes.TabStop = false;
             grpDetalhes.Text = "Consumo da Mesa";
@@ -129,7 +129,7 @@ namespace Restaurant.App.Others
             dgvDetails.RowHeadersVisible = false;
             dgvDetails.RowHeadersWidth = 51;
             dgvDetails.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvDetails.Size = new Size(536, 316);
+            dgvDetails.Size = new Size(533, 316);
             dgvDetails.TabIndex = 0;
             // 
             // lblTotalLabel
@@ -138,7 +138,7 @@ namespace Restaurant.App.Others
             lblTotalLabel.AutoSize = true;
             lblTotalLabel.Depth = 0;
             lblTotalLabel.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblTotalLabel.Location = new Point(282, 367);
+            lblTotalLabel.Location = new Point(279, 367);
             lblTotalLabel.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
             lblTotalLabel.Name = "lblTotalLabel";
             lblTotalLabel.Size = new Size(107, 19);
@@ -151,7 +151,7 @@ namespace Restaurant.App.Others
             lblTotalValue.AutoSize = true;
             lblTotalValue.Depth = 0;
             lblTotalValue.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblTotalValue.Location = new Point(419, 360);
+            lblTotalValue.Location = new Point(416, 360);
             lblTotalValue.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
             lblTotalValue.Name = "lblTotalValue";
             lblTotalValue.Size = new Size(54, 19);
@@ -203,7 +203,6 @@ namespace Restaurant.App.Others
             // lblDailyRevenue
             // 
             lblDailyRevenue.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            lblDailyRevenue.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             lblDailyRevenue.Density = MaterialButton.MaterialButtonDensity.Default;
             lblDailyRevenue.Depth = 0;
             lblDailyRevenue.HighEmphasis = true;

@@ -100,6 +100,7 @@ namespace Restaurant.App.Register
         // Verifica se uma mesa já tem uma conta aberta antes de iniciar uma nova
         private void CarregarPedidoSeExistir(int tableNumber)
         {
+            // Procura se já existe um pedido aberto para a mesa digitada
             var pedidoExistente = _orderService.GetOpenOrders()
                                                .FirstOrDefault(o => o.TableNumber == tableNumber);
 
@@ -108,10 +109,18 @@ namespace Restaurant.App.Register
                 _currentOrderId = pedidoExistente.Id;
                 IsAlteracao = true;
                 txtTableNumber.Text = pedidoExistente.TableNumber.ToString();
+
                 if (pedidoExistente.WaiterId > 0)
                     cmbWaiter.SelectedValue = pedidoExistente.WaiterId;
 
-                CarregaItensPedido(); // Carrega os itens já consumidos
+                CarregaItensPedido(); // Carrega os itens que já estão na conta desta mesa
+            }
+            else
+            {
+                // CORREÇÃO: Se a mesa não tem pedido, limpamos o contexto anterior
+                _currentOrderId = 0;
+                IsAlteracao = false;
+                dgvOrderItems.DataSource = null; // Limpa a grade de itens da tela
             }
         }
 
@@ -160,29 +169,53 @@ namespace Restaurant.App.Register
         {
             try
             {
-                int tableNum = int.Parse(txtTableNumber.Text);
-                if (_currentOrderId == 0) CarregarPedidoSeExistir(tableNum);
-
-                // Se o pedido não existir, cria um automaticamente antes de adicionar o item
-                if (_currentOrderId == 0)
+                if (string.IsNullOrEmpty(txtTableNumber.Text))
                 {
-                    var order = new Order { TableNumber = tableNum, WaiterId = (int)cmbWaiter.SelectedValue };
-                    var savedOrder = _baseOrderService.Add<Order, OrderViewModel, OrderValidator>(order);
-                    _currentOrderId = savedOrder.Id;
+                    MessageBox.Show("Informe o número da mesa.");
+                    return;
                 }
 
+                int tableNum = int.Parse(txtTableNumber.Text);
+
+                // CORREÇÃO: Forçamos sempre a validação da mesa para garantir que o 
+                // _currentOrderId corresponde à mesa que está escrita no campo agora.
+                CarregarPedidoSeExistir(tableNum);
+
+                // Se após a busca a mesa ainda não tiver pedido (_currentOrderId continua 0), criamos um novo
+                if (_currentOrderId == 0)
+                {
+                    if (cmbWaiter.SelectedValue == null)
+                    {
+                        MessageBox.Show("Selecione um garçom para iniciar o pedido.");
+                        return;
+                    }
+
+                    var order = new Order
+                    {
+                        TableNumber = tableNum,
+                        WaiterId = (int)cmbWaiter.SelectedValue,
+                        IsPaid = false,
+                        TotalAmount = 0
+                    };
+
+                    var savedOrder = _baseOrderService.Add<Order, OrderViewModel, OrderValidator>(order);
+                    _currentOrderId = savedOrder.Id;
+                    IsAlteracao = true;
+                }
+
+                // Agora adicionamos o item ao pedido correto (ID sincronizado)
                 int productId = (int)cmbProduct.SelectedValue;
                 int quantity = string.IsNullOrEmpty(txtQuantity.Text) ? 1 : int.Parse(txtQuantity.Text);
 
-                // Delega para o serviço especializado a lógica de adicionar/somar itens
                 _orderService.AddItemToOrder(_currentOrderId, productId, quantity);
 
-                CarregaItensPedido(); 
+                // Atualiza a interface
+                CarregaItensPedido();
                 CarregaGrid();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro: {ex.Message}");
+                MessageBox.Show($"Erro ao adicionar item: {ex.Message}");
             }
         }
 
