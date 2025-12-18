@@ -4,7 +4,7 @@
     {
         public int Volume { get; set; }
 
-        // CONSTRUTOR VAZIO -> EntiTy Framework "materialar os dados vindos do banco
+        // CONSTRUTOR VAZIO -> EntiTy Framework "materialar" os dados vindos do banco
         public Drink()
         {
         }
