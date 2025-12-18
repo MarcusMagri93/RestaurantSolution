@@ -4,13 +4,12 @@ using Restaurant.Domain.Entities;
 
 namespace Restaurant.Repository.Mapping
 {
+    //Define o Nome da Tabela 
     public class DrinkMap : IEntityTypeConfiguration<Drink>
     {
         public void Configure(EntityTypeBuilder<Drink> builder)
         {
-            // Configurações específicas da entidade Drink
-
-            // Volume é obrigatório
+            // Primary Key
             builder.Property(d => d.Volume)
                 .IsRequired();
         }

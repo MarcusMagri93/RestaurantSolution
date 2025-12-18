@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.Domain.Entities;
 using Restaurant.Repository.Mapping;
-using System.Reflection; // Necessário para ApplyConfigurationsFromAssembly
+using System.Reflection; 
 
 namespace Restaurant.Repository.Context
 {
@@ -17,6 +17,8 @@ namespace Restaurant.Repository.Context
         {
             optionsBuilder.UseMySQL("server=localhost;port=3306;database=RestaurantDB;user=root;password=");
         }
+
+        // Mapeamento das Tabelas 
         public DbSet<Drink> Drink { get; set; }
         public DbSet<Food> Food { get; set; }
         public DbSet<Order> Order { get; set; }

@@ -10,10 +10,10 @@ namespace Restaurant.Repository.Mapping
         {
             builder.ToTable("Waiters");
 
-            // --- CONFIGURAÇÃO DE ID COM AUTO INCREMENTO ---
+            // ID com Auto Incremento 
             builder.HasKey(w => w.Id);
             builder.Property(w => w.Id)
-                .ValueGeneratedOnAdd(); // Garante que o banco gere o ID sequencialmente
+                .ValueGeneratedOnAdd(); 
 
             builder.HasIndex(w => w.Registration)
                 .IsUnique();

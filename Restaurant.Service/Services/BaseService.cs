@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using Restaurant.Domain.Base; 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Restaurant.Domain.Base;
+
 
 namespace Restaurant.Services.Services.Base
 {
+    // Classe genérica 
     public class BaseService<TEntity> : IBaseService<TEntity>
-        where TEntity : BaseEntity<int> 
+        where TEntity : BaseEntity<int>
     {
         protected readonly IBaseRepository<TEntity> _repository;
         protected readonly IMapper _mapper;
@@ -19,8 +18,7 @@ namespace Restaurant.Services.Services.Base
             _mapper = mapper;
         }
 
-     // Implementação dos métodos CRUD, Get, Update, Delete)
-
+        // ADD
         public TOutputModel Add<TInputModel, TOutputModel, TValidator>(TInputModel inputModel)
             where TInputModel : class
             where TOutputModel : class
@@ -34,6 +32,7 @@ namespace Restaurant.Services.Services.Base
             validator.ValidateAndThrow(entity);
 
             _repository.Add(entity);
+
             return _mapper.Map<TOutputModel>(entity);
         }
 
@@ -58,6 +57,7 @@ namespace Restaurant.Services.Services.Base
             _repository.Delete(id);
         }
 
+        // Recupera todos os registros e já os converte para ViewModels automaticamente
         public IList<TOutputModel> Get<TOutputModel>() where TOutputModel : class
         {
             var entities = _repository.Get().ToList();

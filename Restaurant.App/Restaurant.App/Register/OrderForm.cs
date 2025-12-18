@@ -1,25 +1,21 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Forms;
-using Restaurant.Domain.Interfaces.Base;
+﻿using Restaurant.Domain.Interfaces.Base;
 using Restaurant.App.Base;
 using Restaurant.App.ViewModel;
 using Restaurant.Domain.Base;
 using Restaurant.Domain.Entities;
-using Restaurant.Domain.Interfaces;
 using Restaurant.Services.Validators;
-using FluentValidation;
-using System.Collections.Generic;
 
 namespace Restaurant.App.Register
 {
     public partial class OrderForm : BaseForm
     {
+        // Definição dos serviços que serão injetados via construtor
         private readonly IBaseService<Order> _baseOrderService;
         private readonly IOrderService _orderService;
         private readonly IBaseService<Waiter> _waiterService;
         private readonly IBaseService<Product> _productService;
 
+        // Variável que controla qual o pedido está a ser editado no momento (0 = Novo)
         private int _currentOrderId = 0;
 
         public OrderForm(
@@ -34,69 +30,52 @@ namespace Restaurant.App.Register
             _waiterService = waiterService;
             _productService = productService;
 
+            // Define a aba inicial como "Cadastro"
             this.tabControlCadastro.SelectedIndex = 0;
         }
 
+        // Janela Visíveis
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
             if (this.Visible)
             {
-                CarregaCombos();
+                CarregaCombos(); // Preenche os dropdowns de garçom e produto
                 this.tabControlCadastro.SelectedIndex = 0;
                 LimpaCampos();
                 _currentOrderId = 0;
                 dgvOrderItems.DataSource = null;
                 IsAlteracao = false;
-                CarregaGrid();
+                CarregaGrid(); // Atualiza a aba de consulta
             }
         }
 
-        // --- SOBRESCRITA DO BOTÃO CANCELAR ---
-        protected override void Cancelar()
-        {
-            if (MessageBox.Show(@"Deseja limpar os campos do pedido?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                // Limpa os campos visuais
-                LimpaCampos();
+        // --- MÉTODOS DE APOIO À INTERFACE ---
 
-                // Reseta o estado interno do formulário
-                _currentOrderId = 0;
-                dgvOrderItems.DataSource = null;
-                IsAlteracao = false;
-
-                //Força permanecer na aba de cadastro
-                tabControlCadastro.SelectedIndex = 0;
-            }
-        }
-
+        // Preenche as listas de seleção com dados do banco
         private void CarregaCombos()
         {
+            // Busca todos os garçons e vincula ao componente da tela
             var waiters = _waiterService.Get<WaiterViewModel>().ToList();
             cmbWaiter.DataSource = waiters;
-            cmbWaiter.DisplayMember = "Name";
-            cmbWaiter.ValueMember = "Id";
+            cmbWaiter.DisplayMember = "Name"; 
+            cmbWaiter.ValueMember = "Id";     
 
+            // Busca todos os produtos para a seleção de itens
             var products = _productService.Get<ProductViewModel>().ToList();
             cmbProduct.DataSource = products;
             cmbProduct.DisplayMember = "Name";
             cmbProduct.ValueMember = "Id";
         }
 
-        protected override void CarregaGrid()
-        {
-            dataGridViewConsulta.DataSource = null;
-            dataGridViewConsulta.AutoGenerateColumns = true;
-            dataGridViewConsulta.DataSource = _orderService.GetAllWithDetails<OrderViewModel>();
-            dataGridViewConsulta.Refresh();
-        }
-
+        // Atualiza a grade secundária que mostra os itens do pedido atual
         private void CarregaItensPedido()
         {
             if (_currentOrderId == 0) return;
 
             try
             {
+                // Busca o pedido detalhado através do serviço especializado
                 var order = _orderService.GetOrder(_currentOrderId);
                 if (order != null && order.OrderItems != null)
                 {
@@ -105,6 +84,7 @@ namespace Restaurant.App.Register
                         Id = i.Id,
                         Produto = i.Product != null ? i.Product.Name : "Produto " + i.ProductId,
                         Qtd = i.Quantity,
+                        // Cálculo em tempo real do subtotal da linha
                         Total = ((decimal)(i.Product?.Price ?? 0)) * i.Quantity
                     }).ToList();
 
@@ -117,6 +97,7 @@ namespace Restaurant.App.Register
             }
         }
 
+        // Verifica se uma mesa já tem uma conta aberta antes de iniciar uma nova
         private void CarregarPedidoSeExistir(int tableNumber)
         {
             var pedidoExistente = _orderService.GetOpenOrders()
@@ -126,33 +107,24 @@ namespace Restaurant.App.Register
             {
                 _currentOrderId = pedidoExistente.Id;
                 IsAlteracao = true;
-
                 txtTableNumber.Text = pedidoExistente.TableNumber.ToString();
                 if (pedidoExistente.WaiterId > 0)
                     cmbWaiter.SelectedValue = pedidoExistente.WaiterId;
 
-                CarregaItensPedido();
+                CarregaItensPedido(); // Carrega os itens já consumidos
             }
         }
+
+        // --- LÓGICA DE SALVAMENTO E ITENS ---
 
         protected override void Salvar()
         {
             try
             {
-                if (string.IsNullOrEmpty(txtTableNumber.Text))
-                {
-                    MessageBox.Show("Informe o número da mesa.");
-                    return;
-                }
-
-                if (cmbWaiter.SelectedValue == null)
-                {
-                    MessageBox.Show("Selecione um garçom.");
-                    return;
-                }
+                if (string.IsNullOrEmpty(txtTableNumber.Text)) { MessageBox.Show("Informe a mesa."); return; }
+                if (cmbWaiter.SelectedValue == null) { MessageBox.Show("Selecione um garçom."); return; }
 
                 int tableNum = int.Parse(txtTableNumber.Text);
-
                 if (_currentOrderId == 0) CarregarPedidoSeExistir(tableNum);
 
                 var order = new Order
@@ -167,7 +139,7 @@ namespace Restaurant.App.Register
                 {
                     order.Id = _currentOrderId;
                     _baseOrderService.Update<Order, OrderViewModel, OrderValidator>(order);
-                    MessageBox.Show("Dados do pedido atualizados!");
+                    MessageBox.Show("Pedido atualizado!");
                 }
                 else
                 {
@@ -176,17 +148,11 @@ namespace Restaurant.App.Register
                     IsAlteracao = true;
                     MessageBox.Show($"Pedido #{savedOrder.Id} iniciado!");
                 }
-
                 CarregaGrid();
-            }
-            catch (ValidationException vex)
-            {
-                var errors = string.Join("\n", vex.Errors);
-                MessageBox.Show(errors, "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao salvar pedido: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao salvar: {ex.Message}");
             }
         }
 
@@ -194,69 +160,37 @@ namespace Restaurant.App.Register
         {
             try
             {
-                if (string.IsNullOrEmpty(txtTableNumber.Text) || cmbWaiter.SelectedValue == null)
-                {
-                    MessageBox.Show("Preencha a Mesa e o Garçom para iniciar o pedido.");
-                    return;
-                }
-
                 int tableNum = int.Parse(txtTableNumber.Text);
-
                 if (_currentOrderId == 0) CarregarPedidoSeExistir(tableNum);
 
+                // Se o pedido não existir, cria um automaticamente antes de adicionar o item
                 if (_currentOrderId == 0)
                 {
-                    var order = new Order
-                    {
-                        TableNumber = tableNum,
-                        WaiterId = (int)cmbWaiter.SelectedValue,
-                        IsPaid = false,
-                        TotalAmount = 0
-                    };
-
+                    var order = new Order { TableNumber = tableNum, WaiterId = (int)cmbWaiter.SelectedValue };
                     var savedOrder = _baseOrderService.Add<Order, OrderViewModel, OrderValidator>(order);
                     _currentOrderId = savedOrder.Id;
-                    IsAlteracao = true;
-                }
-
-                if (cmbProduct.SelectedValue == null)
-                {
-                    MessageBox.Show("Selecione um produto.");
-                    return;
                 }
 
                 int productId = (int)cmbProduct.SelectedValue;
                 int quantity = string.IsNullOrEmpty(txtQuantity.Text) ? 1 : int.Parse(txtQuantity.Text);
 
+                // Delega para o serviço especializado a lógica de adicionar/somar itens
                 _orderService.AddItemToOrder(_currentOrderId, productId, quantity);
 
-                CarregaItensPedido();
+                CarregaItensPedido(); 
                 CarregaGrid();
-
-                MessageBox.Show("Item adicionado!");
-            }
-            catch (ValidationException vex)
-            {
-                MessageBox.Show(string.Join("\n", vex.Errors), "Validação");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao adicionar item: {ex.Message}");
+                MessageBox.Show($"Erro: {ex.Message}");
             }
         }
 
-        protected override void Deletar(int id)
+        // --- SOBRESCRITAS DO BASEFORM ---
+
+        protected override void CarregaGrid()
         {
-            try
-            {
-                _baseOrderService.Delete(id);
-                MessageBox.Show("Pedido excluído!");
-                CarregaGrid();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao excluir: {ex.Message}");
-            }
+            dataGridViewConsulta.DataSource = _orderService.GetAllWithDetails<OrderViewModel>();
         }
 
         protected override void CarregaRegistro(DataGridViewRow? linha)
@@ -265,14 +199,17 @@ namespace Restaurant.App.Register
             {
                 _currentOrderId = (int)linha.Cells["Id"].Value;
                 txtTableNumber.Text = linha.Cells["TableNumber"].Value?.ToString();
-
-                if (linha.Cells["WaiterId"].Value != null)
-                    cmbWaiter.SelectedValue = (int)linha.Cells["WaiterId"].Value;
-
+                cmbWaiter.SelectedValue = (int)linha.Cells["WaiterId"].Value;
                 IsAlteracao = true;
                 CarregaItensPedido();
                 tabControlCadastro.SelectedIndex = 0;
             }
+        }
+
+        protected override void Deletar(int id)
+        {
+            _baseOrderService.Delete(id);
+            CarregaGrid();
         }
     }
 }

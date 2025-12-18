@@ -3,15 +3,13 @@ using Restaurant.Domain.Base;
 using Restaurant.Domain.Entities;
 using Restaurant.Domain.Interfaces.Base;
 using Restaurant.Services.Services.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace Restaurant.Services.Services
 {
     public class OrderService : BaseService<Order>, IOrderService
     {
+        // Repositórios auxiliares 
         protected readonly IBaseRepository<Product> _productRepository;
         protected readonly IBaseRepository<OrderItem> _orderItemRepository;
 
@@ -26,7 +24,7 @@ namespace Restaurant.Services.Services
             _orderItemRepository = orderItemRepository;
         }
 
-        // Busca histórico completo com detalhes
+        // Consulta Detalhada
         public IList<TOutputModel> GetAllWithDetails<TOutputModel>() where TOutputModel : class
         {
             var orders = _repository.Get()
@@ -41,7 +39,7 @@ namespace Restaurant.Services.Services
         public IList<TOutputModel> GetOpenOrdersWithDetails<TOutputModel>() where TOutputModel : class
         {
             var orders = _repository.Get()
-                .Where(o => !o.IsPaid) // Filtro: Apenas não pagos
+                .Where(o => !o.IsPaid) // Filtra apenas o que ainda não foi faturado
                 .Include(o => o.Waiter)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
@@ -78,6 +76,7 @@ namespace Restaurant.Services.Services
 
             if (order.OrderItems == null) order.OrderItems = new List<OrderItem>();
 
+            // Se o item já existe no pedido, apenas soma a quantidade
             var existingItem = order.OrderItems.FirstOrDefault(item => item.ProductId == productId);
 
             if (existingItem != null)
@@ -92,27 +91,27 @@ namespace Restaurant.Services.Services
                 order.OrderItems.Add(newItem);
             }
 
+            // Atualiza o total do pedido sempre que um item é mexido
             order.TotalAmount = CalcularTotalLocal(order);
             _repository.Update(order);
         }
 
         public void CloseBill(int orderId)
         {
-            // Carrega o pedido com os itens inclusos para o cálculo
             var order = _repository.Get()
                 .Include(o => o.OrderItems)
                 .FirstOrDefault(o => o.Id == orderId);
 
             if (order == null) throw new KeyNotFoundException($"Pedido {orderId} não encontrado.");
 
-            // Calcula o total e marca como pago no mesmo objeto
+            // Calcula o total final e marca a mesa como livre (IsPaid = true)
             order.TotalAmount = CalcularTotalLocal(order);
             order.IsPaid = true;
 
-            // Salva uma única vez
             _repository.Update(order);
         }
 
+        // Cálculo da conta
         private decimal CalcularTotalLocal(Order order)
         {
             decimal total = 0;
@@ -139,7 +138,7 @@ namespace Restaurant.Services.Services
 
         public double GetTotalRevenue(DateTime date)
         {
-            // Define o início e o fim do dia para uma busca precisa no banco
+            // Lógica de fechamento de caixa diário
             var inicioDia = date.Date;
             var fimDia = inicioDia.AddDays(1);
 
@@ -147,6 +146,7 @@ namespace Restaurant.Services.Services
                 .Where(o => o.IsPaid && o.OrderDate >= inicioDia && o.OrderDate < fimDia)
                 .Sum(o => o.TotalAmount);
         }
+
         public IList<Order> GetOpenOrders() => _repository.Get().Where(o => !o.IsPaid).ToList();
     }
 }

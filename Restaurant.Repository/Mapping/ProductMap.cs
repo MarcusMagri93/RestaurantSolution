@@ -8,11 +8,12 @@ namespace Restaurant.Repository.Mapping
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
+            // Nome da Tabela 
             builder.ToTable("Products");
+            // Primary Key
             builder.HasKey(p => p.Id);
 
-            // --- CRUCIAL: TRAVA DE UNICIDADE ---
-            // Cria um índice único para o Nome. O banco rejeitará duplicatas.
+            // Evita Nome Repetido
             builder.HasIndex(p => p.Name)
                 .IsUnique();
 
@@ -24,7 +25,7 @@ namespace Restaurant.Repository.Mapping
                 .HasMaxLength(255)
                 .IsRequired();
 
-            // Configuração da Herança (TPH)
+            // Configuração da Herança 
             builder.HasDiscriminator<string>("ProductType")
                 .HasValue<Food>("Food")
                 .HasValue<Drink>("Drink");

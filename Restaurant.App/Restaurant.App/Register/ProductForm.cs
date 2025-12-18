@@ -16,7 +16,6 @@ namespace Restaurant.App.Register
         private readonly IBaseService<Food> _foodService;
         private readonly IBaseService<Drink> _drinkService;
 
-        // Propriedade para controlar qual aba abrir (0 = Cadastro, 1 = Consulta)
         public int TabIndexInicial { get; set; } = 0;
 
         public ProductForm(
@@ -29,52 +28,28 @@ namespace Restaurant.App.Register
             _foodService = foodService;
             _drinkService = drinkService;
 
-            UpdateVisibility();
+            UpdateVisibility(); 
         }
 
-        private void Type_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateVisibility();
-        }
-
+        // LÓGICA DE INTERFACE DINÂMICA
+        // Esconde ou mostra campos dependendo se é Comida ou Bebida
         private void UpdateVisibility()
         {
             bool isFood = radFood.Checked;
 
+            // Campos específicos de Comida (Peso e Ingredientes)
             lblWeight.Visible = isFood;
             txtWeight.Visible = isFood;
             lblIngredients.Visible = isFood;
             txtIngredients.Visible = isFood;
 
+            // Campo específico de Bebida (Volume)
             lblVolume.Visible = !isFood;
             txtVolume.Visible = !isFood;
         }
 
-        protected override void OnVisibleChanged(EventArgs e)
-        {
-            base.OnVisibleChanged(e);
-            if (this.Visible)
-            {
-                // Usa a propriedade definida pelo Menu Principal para escolher a aba
-                this.tabControlCadastro.SelectedIndex = TabIndexInicial;
-
-                // Se for cadastro, limpa tudo. Se for consulta, carrega a grid.
-                if (TabIndexInicial == 0)
-                {
-                    LimpaCampos();
-                    IsAlteracao = false;
-                    radFood.Checked = true;
-                }
-                else
-                {
-                    CarregaGrid();
-                }
-            }
-        }
-
         protected override void CarregaGrid()
         {
-            // Força a atualização das colunas (incluindo "Type")
             dataGridViewConsulta.DataSource = null;
             dataGridViewConsulta.AutoGenerateColumns = true;
             dataGridViewConsulta.DataSource = _productService.Get<ProductViewModel>();
@@ -87,8 +62,8 @@ namespace Restaurant.App.Register
             {
                 string nomeProduto = txtProductName.Text.Trim();
 
+                // VALIDAÇÃO DE DUPLICIDADE MANUAL
                 var produtosExistentes = _productService.Get<ProductViewModel>();
-
                 bool produtoJaExiste = produtosExistentes.Any(p =>
                     p.Name.Equals(nomeProduto, StringComparison.OrdinalIgnoreCase) &&
                     (!IsAlteracao || p.Id != (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value)
@@ -96,14 +71,12 @@ namespace Restaurant.App.Register
 
                 if (produtoJaExiste)
                 {
-                    MessageBox.Show(
-                        $"Já existe um produto chamado '{nomeProduto}'.\nO sistema não aceita nomes repetidos.",
-                        "Duplicidade Encontrada",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
+                    MessageBox.Show($"Já existe um produto chamado '{nomeProduto}'.", "Duplicidade", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
+                // POLIMORFISMO NA PRÁTICA
+                // Se Food estiver marcado, usamos o _foodService
                 if (radFood.Checked)
                 {
                     var food = new Food
@@ -114,20 +87,17 @@ namespace Restaurant.App.Register
                         Ingredients = txtIngredients.Text
                     };
 
-                    if (IsAlteracao && dataGridViewConsulta.SelectedRows.Count > 0)
-                        food.Id = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
-
                     if (IsAlteracao)
                     {
+                        food.Id = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
                         _foodService.Update<Food, ProductViewModel, FoodValidator>(food);
-                        MessageBox.Show("Prato atualizado!");
                     }
                     else
                     {
                         _foodService.Add<Food, ProductViewModel, FoodValidator>(food);
-                        MessageBox.Show("Prato cadastrado!");
                     }
                 }
+                // Se não, usamos o _drinkService
                 else
                 {
                     var drink = new Drink
@@ -137,27 +107,24 @@ namespace Restaurant.App.Register
                         Volume = string.IsNullOrEmpty(txtVolume.Text) ? 0 : int.Parse(txtVolume.Text)
                     };
 
-                    if (IsAlteracao && dataGridViewConsulta.SelectedRows.Count > 0)
-                        drink.Id = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
-
                     if (IsAlteracao)
                     {
+                        drink.Id = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
                         _drinkService.Update<Drink, ProductViewModel, DrinkValidator>(drink);
-                        MessageBox.Show("Bebida atualizada!");
                     }
                     else
                     {
                         _drinkService.Add<Drink, ProductViewModel, DrinkValidator>(drink);
-                        MessageBox.Show("Bebida cadastrada!");
                     }
                 }
 
                 LimpaCampos();
                 CarregaGrid();
-                tabControlCadastro.SelectedIndex = 1; // Vai para lista após salvar
+                tabControlCadastro.SelectedIndex = 1;
             }
             catch (ValidationException vex)
             {
+                // Erros de validação (preço negativo)
                 var errors = string.Join("\n", vex.Errors);
                 MessageBox.Show(errors, "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -179,35 +146,24 @@ namespace Restaurant.App.Register
             try
             {
                 _productService.Delete(id);
-                MessageBox.Show("Produto excluído com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Produto excluído com sucesso!");
             }
             catch (Exception ex)
             {
-                // Verifica se o erro é de violação de chave estrangeira (produto sendo usado)
+                // INTEGRIDADE REFERENCIAL:
+                // Se o produto já foi vendido o banco impede a exclusão.
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE statement conflicted"))
                 {
-                    MessageBox.Show("Não é possível excluir este produto pois ele já foi vendido em pedidos anteriores. " +
-                                    "Para removê-lo do cardápio, considere desativá-lo.",
-                                    "Bloqueio de Exclusão", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Não é possível excluir este produto pois ele já foi vendido em pedidos anteriores.", "Bloqueio de Exclusão", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 else
                 {
-                    MessageBox.Show($"Não foi possível excluir o produto. Verifique se ele possui vendas vinculadas.\nDetalhes: {ex.Message}",
-                                    "Erro ao Excluir", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Não foi possível excluir o produto. Detalhes: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             finally
             {
                 CarregaGrid();
-            }
-        }
-
-        protected override void CarregaRegistro(DataGridViewRow? linha)
-        {
-            if (linha != null)
-            {
-                txtProductName.Text = linha.Cells["Name"].Value?.ToString();
-                txtPrice.Text = linha.Cells["Price"].Value?.ToString();
             }
         }
     }

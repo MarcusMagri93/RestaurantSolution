@@ -20,7 +20,7 @@ namespace Restaurant.Repository.Mapping
 
             // Relacionamento N:1 com Product
             builder.HasOne(oi => oi.Product)
-                .WithMany() // Assumindo que Product não tem uma coleção de OrderItems
+                .WithMany() 
                 .HasForeignKey(oi => oi.ProductId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);

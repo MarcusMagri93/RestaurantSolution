@@ -7,6 +7,7 @@ namespace Restaurant.App.Base
 {
     public partial class BaseForm : MaterialForm
     {
+        // IsAlteracao -> false(Novo registro) true(Alteração)
         protected bool IsAlteracao = false;
 
         public BaseForm()
@@ -15,15 +16,14 @@ namespace Restaurant.App.Base
             tabControlCadastro.SelectedIndexChanged += TabControlCadastro_SelectedIndexChanged;
         }
 
+        // Cadastro (índice 0) ou Consulta (índice 1).
         private void TabControlCadastro_SelectedIndexChanged(object? sender, EventArgs e)
         {
             bool isCadastro = tabControlCadastro.SelectedIndex == 0;
 
-            // O botão Salvar e Cancelar aparecem apenas na aba de Cadastro
             btnSalvar.Visible = isCadastro;
             btnCancelar.Visible = isCadastro;
 
-            // O botão Excluir aparece apenas na aba de Consulta
             btnExcluir.Visible = !isCadastro;
         }
 
@@ -37,7 +37,7 @@ namespace Restaurant.App.Base
             if (MessageBox.Show(@"Deseja realmente cancelar?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 LimpaCampos();
-                tabControlCadastro.SelectedIndex = 1;
+                tabControlCadastro.SelectedIndex = 1; // Retorna para a aba de listagem.
             }
         }
 
@@ -48,13 +48,15 @@ namespace Restaurant.App.Base
 
         private void btnExcluir_Click(object sender, EventArgs e)
         {
+            // Verifica se o usuário selecionou uma linha na grade antes de excluir.
             if (dataGridViewConsulta.SelectedRows.Count > 0)
             {
                 if (MessageBox.Show(@"Deseja realmente excluir este registro?", @"Restaurant App", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
+                    // Recupera o ID da linha selecionada para passar ao serviço de deletar.
                     int id = (int)dataGridViewConsulta.SelectedRows[0].Cells["Id"].Value;
                     Deletar(id);
-                    CarregaGrid();
+                    CarregaGrid(); // Atualiza a lista após a exclusão.
                 }
             }
             else
@@ -100,7 +102,7 @@ namespace Restaurant.App.Base
             {
                 IsAlteracao = true;
                 var linha = dataGridViewConsulta.SelectedRows[0];
-                CarregaRegistro(linha);
+                CarregaRegistro(linha); // Preenche os campos do cadastro com os dados da linha.
                 tabControlCadastro.SelectedIndex = 0;
                 tabControlCadastro.Focus();
             }

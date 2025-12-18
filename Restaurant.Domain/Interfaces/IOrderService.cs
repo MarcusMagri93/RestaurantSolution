@@ -15,10 +15,10 @@ namespace Restaurant.Domain.Interfaces.Base
         double GetTotalRevenue(DateTime date);
         IList<Order> GetOpenOrders();
 
-        // Busca TODOS os pedidos (histórico completo) com detalhes
+        // Busca Todos os pedidos 
         IList<TOutputModel> GetAllWithDetails<TOutputModel>() where TOutputModel : class;
 
-        // Busca APENAS os pedidos em aberto (Mesas Ativas) com detalhes
+        // Busca apenas os pedidos em aberto 
         IList<TOutputModel> GetOpenOrdersWithDetails<TOutputModel>() where TOutputModel : class;
     }
 }

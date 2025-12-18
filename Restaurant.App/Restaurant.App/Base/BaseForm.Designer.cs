@@ -8,6 +8,7 @@ namespace Restaurant.App.Base
     {
         private System.ComponentModel.IContainer components = null;
 
+        // Os componentes são declarados como 'protected' para que os filhos possam Herdá-los. 
         protected MaterialTabControl tabControlCadastro;
         protected System.Windows.Forms.TabPage tabPageCadastro;
         protected System.Windows.Forms.TabPage tabPageConsulta;
@@ -16,7 +17,7 @@ namespace Restaurant.App.Base
         protected MaterialButton btnCancelar;
         protected MaterialButton btnExcluir;
 
-
+        // Método que limpa os recursos da memória ao fechar o formulário.
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -28,6 +29,8 @@ namespace Restaurant.App.Base
 
         #region Windows Form Designer generated code
 
+        // Este método configura todos os controles visuais. 
+        // Ele é chamado no construtor da classe BaseForm.cs.
         protected void InitializeComponent()
         {
             tabControlCadastro = new MaterialTabControl();
@@ -41,9 +44,8 @@ namespace Restaurant.App.Base
             tabPageConsulta.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewConsulta).BeginInit();
             SuspendLayout();
-            // 
+
             // tabControlCadastro
-            // 
             tabControlCadastro.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControlCadastro.Controls.Add(tabPageCadastro);
             tabControlCadastro.Controls.Add(tabPageConsulta);
@@ -55,17 +57,9 @@ namespace Restaurant.App.Base
             tabControlCadastro.SelectedIndex = 0;
             tabControlCadastro.Size = new Size(794, 665);
             tabControlCadastro.TabIndex = 0;
-            // 
-            // tabPageCadastro
-            // 
-            tabPageCadastro.Location = new Point(4, 29);
-            tabPageCadastro.Name = "tabPageCadastro";
-            tabPageCadastro.Size = new Size(786, 632);
-            tabPageCadastro.TabIndex = 0;
-            tabPageCadastro.Text = "Cadastro";
-            // 
+
             // tabPageConsulta
-            // 
+            // Vincula o evento 'Enter' (quando o usuário clica na aba) ao método da classe base.
             tabPageConsulta.Controls.Add(dataGridViewConsulta);
             tabPageConsulta.Location = new Point(4, 29);
             tabPageConsulta.Name = "tabPageConsulta";
@@ -73,9 +67,8 @@ namespace Restaurant.App.Base
             tabPageConsulta.TabIndex = 1;
             tabPageConsulta.Text = "Consulta";
             tabPageConsulta.Enter += tabPageConsulta_Enter;
-            // 
+
             // dataGridViewConsulta
-            // 
             dataGridViewConsulta.AllowUserToAddRows = false;
             dataGridViewConsulta.AllowUserToDeleteRows = false;
             dataGridViewConsulta.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -88,74 +81,26 @@ namespace Restaurant.App.Base
             dataGridViewConsulta.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridViewConsulta.Size = new Size(774, 620);
             dataGridViewConsulta.TabIndex = 0;
+            // Evento de clique duplo para abrir o modo de edição.
             dataGridViewConsulta.CellDoubleClick += dataGridViewConsulta_CellDoubleClick;
-            // 
+
             // btnSalvar
-            // 
             btnSalvar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnSalvar.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             btnSalvar.Density = MaterialButton.MaterialButtonDensity.Default;
             btnSalvar.Depth = 0;
             btnSalvar.HighEmphasis = true;
-            btnSalvar.Icon = null;
-            btnSalvar.IconType = MaterialButton.MaterialIconType.Rebase;
             btnSalvar.Location = new Point(600, 30);
             btnSalvar.Margin = new Padding(4, 6, 4, 6);
-            btnSalvar.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
             btnSalvar.Name = "btnSalvar";
-            btnSalvar.NoAccentTextColor = Color.Empty;
             btnSalvar.Size = new Size(76, 36);
             btnSalvar.TabIndex = 1;
             btnSalvar.Text = "Salvar";
             btnSalvar.Type = MaterialButton.MaterialButtonType.Contained;
             btnSalvar.UseAccentColor = false;
             btnSalvar.Click += btnSalvar_Click;
-            // 
-            // btnCancelar
-            // 
-            btnCancelar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnCancelar.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnCancelar.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnCancelar.Depth = 0;
-            btnCancelar.HighEmphasis = true;
-            btnCancelar.Icon = null;
-            btnCancelar.IconType = MaterialButton.MaterialIconType.Rebase;
-            btnCancelar.Location = new Point(690, 30);
-            btnCancelar.Margin = new Padding(4, 6, 4, 6);
-            btnCancelar.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
-            btnCancelar.Name = "btnCancelar";
-            btnCancelar.NoAccentTextColor = Color.Empty;
-            btnCancelar.Size = new Size(96, 36);
-            btnCancelar.TabIndex = 2;
-            btnCancelar.Text = "Cancelar";
-            btnCancelar.Type = MaterialButton.MaterialButtonType.Contained;
-            btnCancelar.UseAccentColor = false;
-            btnCancelar.Click += btnCancelar_Click;
-            // 
-            // btnExcluir
-            // 
-            btnExcluir.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnExcluir.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnExcluir.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnExcluir.Depth = 0;
-            btnExcluir.HighEmphasis = true;
-            btnExcluir.Icon = null;
-            btnExcluir.IconType = MaterialButton.MaterialIconType.Rebase;
-            btnExcluir.Location = new Point(500, 30);
-            btnExcluir.Margin = new Padding(4, 6, 4, 6);
-            btnExcluir.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
-            btnExcluir.Name = "btnExcluir";
-            btnExcluir.NoAccentTextColor = Color.Empty;
-            btnExcluir.Size = new Size(80, 36);
-            btnExcluir.TabIndex = 3;
-            btnExcluir.Text = "Excluir";
-            btnExcluir.Type = MaterialButton.MaterialButtonType.Contained;
-            btnExcluir.UseAccentColor = true;
-            btnExcluir.Visible = false;
-            btnExcluir.Click += btnExcluir_Click;
-            // 
-            // BaseForm
-            // 
+
+            // Configuração do formulário base (MaterialForm)
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 749);
@@ -172,7 +117,6 @@ namespace Restaurant.App.Base
             ((System.ComponentModel.ISupportInitialize)dataGridViewConsulta).EndInit();
             ResumeLayout(false);
             PerformLayout();
-
         }
 
         #endregion

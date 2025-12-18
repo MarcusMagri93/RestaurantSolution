@@ -15,6 +15,7 @@ namespace Restaurant.App.Others
         protected MaterialLabel lblPassword;
         protected MaterialButton btnRegister;
 
+        //Limpeza quando o form é fechado 
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))

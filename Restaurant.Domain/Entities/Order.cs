@@ -5,12 +5,13 @@ namespace Restaurant.Domain.Entities
 {
     public class Order : BaseEntity<int>
     {
+        // Dados Básicos do Pedido
         public decimal TotalAmount { get; set; }
         public bool IsPaid { get; set; }
         public int TableNumber { get; set; }
         public double TotalValue { get; set; } 
 
-        public DateTime OrderDate { get; set; } = DateTime.Now; // Data e Hora do Pedido
+        public DateTime OrderDate { get; set; } = DateTime.Now; 
 
         // Chaves Estrangeiras
         public int WaiterId { get; set; }
@@ -19,6 +20,7 @@ namespace Restaurant.Domain.Entities
 
         public ICollection<OrderItem> OrderItems { get; set; }
 
+        // Construtores 
         public Order()
         {
             OrderItems = new List<OrderItem>();

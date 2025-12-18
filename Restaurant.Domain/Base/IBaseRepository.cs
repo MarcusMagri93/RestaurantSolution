@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using Restaurant.Domain.Base; // O namespace da sua entidade base
+using Restaurant.Domain.Base; 
 
-// Namespace CORRETO para o seu IBaseRepository
+
 namespace Restaurant.Domain.Base
 {
     public interface IBaseRepository<TEntity> where TEntity : BaseEntity<int>

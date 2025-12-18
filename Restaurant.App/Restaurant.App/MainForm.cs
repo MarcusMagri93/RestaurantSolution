@@ -1,15 +1,12 @@
 ﻿using ReaLTaiizor.Forms;
 using Restaurant.App.Others;
 using Restaurant.App.Register;
-using Microsoft.Extensions.DependencyInjection; // Necessário para criar escopos
-using System;
-using System.Windows.Forms;
+using Microsoft.Extensions.DependencyInjection; 
 
 namespace Restaurant.App
 {
     public partial class MainForm : MaterialForm
     {
-        // Em vez de guardar os formulários velhos, guardamos a "fábrica" de serviços
         private readonly IServiceProvider _serviceProvider;
 
         public MainForm(IServiceProvider serviceProvider)
@@ -19,28 +16,31 @@ namespace Restaurant.App
             this.Text = "Sistema de Gestão de Restaurante";
         }
 
-        // Método genérico para abrir qualquer formulário com dados frescos
+        // Abre qualquer Fomr
         private void OpenForm<T>(Action<T>? configure = null) where T : Form
         {
-            // Cria um "Escopo" novo. Tudo criado aqui (DbContext, Services, Forms) é novo.
+            // Create Scope garante que o banco e os serviços usados sejam fechados junto com a janela 
             using (var scope = _serviceProvider.CreateScope())
             {
+                // Busca o formulário solicitado
                 var form = scope.ServiceProvider.GetRequiredService<T>();
 
-                // Configura propriedades opcionais (ex: TabIndexInicial)
                 configure?.Invoke(form);
 
                 form.ShowDialog();
-            } // Ao sair daqui, o DbContext e o Form são descartados corretamente.
+            }
         }
+
 
         private void MenuProduct_Click(object sender, EventArgs e)
         {
+            // Abre na aba cadastro (0)
             OpenForm<ProductForm>(f => f.TabIndexInicial = 0);
         }
 
         private void MenuListProducts_Click(object sender, EventArgs e)
         {
+            // Abre na aba consulta (1)
             OpenForm<ProductForm>(f => f.TabIndexInicial = 1);
         }
 

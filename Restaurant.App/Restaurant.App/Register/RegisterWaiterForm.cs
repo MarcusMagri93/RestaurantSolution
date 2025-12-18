@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using System.Linq; // Necessário para calcular o Max()
-using Restaurant.App.Base;
+﻿using Restaurant.App.Base;
 using Restaurant.App.ViewModel;
 using Restaurant.Domain.Base;
 using Restaurant.Domain.Entities;
@@ -18,6 +15,7 @@ namespace Restaurant.App.Register
         {
             InitializeComponent();
             _waiterService = waiterService;
+
             this.tabControlCadastro.SelectedIndex = 0;
         }
 
@@ -30,22 +28,25 @@ namespace Restaurant.App.Register
                 LimpaCampos();
                 IsAlteracao = false;
 
-                // Gera o número automaticamente ao abrir a tela
                 GerarProximoRegistro();
             }
         }
 
-        // --- NOVA LÓGICA: AUTO-INCREMENTO DO CAMPO REGISTRO ---
+        // LÓGICA DE AUTO-INCREMENTO 
         private void GerarProximoRegistro()
         {
             try
             {
+                // Busca todos os garçons 
                 var waiters = _waiterService.Get<WaiterViewModel>();
-                int proximoRegistro = 1; // Padrão se não houver ninguém
+                int proximoRegistro = 1; // Valor inicial padrão
 
                 if (waiters != null && waiters.Any())
                 {
-                    // Tenta converter os registros existentes para número e pega o maior
+                    // LINQ: 
+                    // Select: conversão de string para int 
+                    // DefaultIfEmpty(0): assume 0 se estiver vazia 
+                    // Max(): maior número de registro
                     int maxRegistro = waiters
                         .Select(w => int.TryParse(w.Registration, out int n) ? n : 0)
                         .DefaultIfEmpty(0)
@@ -55,11 +56,11 @@ namespace Restaurant.App.Register
                 }
 
                 txtRegistration.Text = proximoRegistro.ToString();
-                txtRegistration.Enabled = false; // Bloqueia para o usuário não mudar
+                txtRegistration.Enabled = false; 
             }
             catch
             {
-                // Fallback de segurança
+                // Se falhar, será 1
                 txtRegistration.Text = "1";
             }
         }
@@ -67,7 +68,6 @@ namespace Restaurant.App.Register
         protected override void Novo()
         {
             base.Novo();
-            // Ao clicar no botão Novo, gera o próximo número
             GerarProximoRegistro();
         }
 
@@ -76,6 +76,7 @@ namespace Restaurant.App.Register
             dataGridViewConsulta.DataSource = _waiterService.Get<WaiterViewModel>();
         }
 
+        // transfere os dados da tela para obj no banco 
         private void FormToObject(Waiter waiter)
         {
             waiter.Name = txtWaiterName.Text;
@@ -104,17 +105,16 @@ namespace Restaurant.App.Register
                 else
                 {
                     _waiterService.Add<Waiter, WaiterViewModel, WaiterValidator>(waiter);
-                    MessageBox.Show($"Garçom cadastrado com sucesso!\nRegistro Gerado: {waiter.Registration}", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"Garçom cadastrado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 LimpaCampos();
                 CarregaGrid();
-
-                // Gera o próximo número para o próximo cadastro imediato
-                GerarProximoRegistro();
+                GerarProximoRegistro(); 
             }
             catch (ValidationException vex)
             {
+                // Captura erros de preenchimento 
                 var errors = string.Join("\n", vex.Errors);
                 MessageBox.Show(errors, "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }

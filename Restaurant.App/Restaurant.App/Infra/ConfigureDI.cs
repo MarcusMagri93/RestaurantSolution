@@ -2,8 +2,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
-using Restaurant.App.Others; // <--- IMPORTANTE: Namespace do novo form
+using Restaurant.App.Others;
 using Restaurant.App.Register;
 using Restaurant.App.ViewModel;
 using Restaurant.Domain.Base;
@@ -11,7 +10,6 @@ using Restaurant.Domain.Entities;
 using Restaurant.Domain.Interfaces;
 using Restaurant.Domain.Interfaces.Base;
 using Restaurant.Repository.Context;
-using Restaurant.Repository.Repositories;
 using Restaurant.Repository.Repositories.Base;
 using Restaurant.Services.Services;
 using Restaurant.Services.Services.Base;
@@ -24,31 +22,37 @@ namespace Restaurant.App.Infra
 {
     public static class ConfigureDI
     {
+
         public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services)
         {
+            // Conexão com o Banco
             var dbConfigFile = "Config/DbConfig.txt";
             var strCon = File.Exists(dbConfigFile) ? File.ReadAllText(dbConfigFile) : "";
 
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
+            // Configuração do Entity Framework
             services.AddDbContext<RestaurantDbContext>(
                 options =>
                 {
-                    options.LogTo(Console.WriteLine);
+                    options.LogTo(Console.WriteLine); 
                     if (!string.IsNullOrEmpty(strCon))
                         options.UseMySQL(strCon);
                 }
             );
 
+            // Registra os serviços
             services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProductService, ProductService>();
 
+            // Registra os validadores do FluentValidation 
             services.AddScoped<AbstractValidator<Food>, FoodValidator>();
             services.AddScoped<AbstractValidator<Waiter>, WaiterValidator>();
             services.AddScoped<AbstractValidator<Order>, OrderValidator>();
             services.AddScoped<AbstractValidator<Drink>, DrinkValidator>();
 
+            // CONFIGURAÇÃO DO AUTOMAPPER.
             services.AddSingleton(
                 new MapperConfiguration(config => {
                     config.CreateMap<Product, ProductViewModel>()
@@ -57,6 +61,7 @@ namespace Restaurant.App.Infra
                               src is Drink ? "Bebida" : "Outro"))
                           .ReverseMap();
 
+                    // Herança nos Mapas (Product -> Food, Drink)
                     config.CreateMap<Food, ProductViewModel>().IncludeBase<Product, ProductViewModel>();
                     config.CreateMap<Drink, ProductViewModel>().IncludeBase<Product, ProductViewModel>();
 
@@ -75,13 +80,12 @@ namespace Restaurant.App.Infra
                 }).CreateMapper()
             );
 
-            // Views
             services.AddSingleton<MainForm>();
             services.AddTransient<LoginForm>();
             services.AddTransient<RegisterWaiterForm>();
             services.AddTransient<ProductForm>();
             services.AddTransient<OrderForm>();
-            services.AddTransient<TableMonitorForm>(); // <--- NOVO REGISTRO
+            services.AddTransient<TableMonitorForm>();
 
             return services;
         }

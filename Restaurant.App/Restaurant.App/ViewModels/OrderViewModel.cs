@@ -10,8 +10,6 @@ namespace Restaurant.App.ViewModel
         public int WaiterId { get; set; }
         public decimal TotalAmount { get; set; }
         public bool IsPaid { get; set; }
-
-        // Melhoria Etapa 2: Resumo dos itens para a grade
         public string ProductsSummary { get; set; } = string.Empty;
 
         public Waiter Waiter { get; set; } = new Waiter();

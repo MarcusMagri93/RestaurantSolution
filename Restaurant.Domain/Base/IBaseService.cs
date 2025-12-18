@@ -1,13 +1,11 @@
 ﻿using FluentValidation;
 using System.Collections.Generic;
 
-namespace Restaurant.Domain.Base // <-- Namespace confirmado pelo seu print
+namespace Restaurant.Domain.Base 
 {
-    // A interface IBaseService DEVE ter a mesma restrição de entidade
     public interface IBaseService<TEntity>
-        where TEntity : BaseEntity<int> // <--- RESTRIÇÃO ESSENCIAL
+        where TEntity : BaseEntity<int> 
     {
-        // Métodos CRUD (usando ViewModels para entrada/saída)
         TOutputModel Add<TInputModel, TOutputModel, TValidator>(TInputModel inputModel)
             where TInputModel : class
             where TOutputModel : class
@@ -20,10 +18,9 @@ namespace Restaurant.Domain.Base // <-- Namespace confirmado pelo seu print
 
         void Delete(int id);
 
-        // Métodos de Consulta
         IList<TOutputModel> Get<TOutputModel>() where TOutputModel : class;
         TOutputModel GetById<TOutputModel>(int id) where TOutputModel : class;
 
-        TEntity GetById(int id); // Para uso interno
+        TEntity GetById(int id); 
     }
 }

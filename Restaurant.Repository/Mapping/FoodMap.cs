@@ -8,13 +8,10 @@ namespace Restaurant.Repository.Mapping
     {
         public void Configure(EntityTypeBuilder<Food> builder)
         {
-            // Configurações específicas da entidade Food
-
-            // Peso é obrigatório
+            // Primary Key
             builder.Property(f => f.Weight)
                 .IsRequired();
 
-            // Ingredientes: Define um tamanho máximo para não ficar como 'longtext' desnecessariamente
             builder.Property(f => f.Ingredients)
                 .HasMaxLength(500)
                 .IsRequired(false);

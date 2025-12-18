@@ -11,6 +11,7 @@ namespace Restaurant.App.Others
     public partial class TableMonitorForm : MaterialForm
     {
         private readonly IOrderService _orderService;
+        // Lista local para armazenar os pedidos ativos e evitar consultas excessivas ao banco de dados
         private List<OrderViewModel> _activeOrders = new List<OrderViewModel>();
 
         public TableMonitorForm(IOrderService orderService)
@@ -20,12 +21,13 @@ namespace Restaurant.App.Others
             dgvTables.SelectionChanged += DgvTables_SelectionChanged;
         }
 
+        // Disparado quando a janela está visível 
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
             if (this.Visible)
             {
-                CarregarMonitor();
+                CarregarMonitor(); // Atualiza os dados sempre que a tela abrir.
             }
         }
 
@@ -34,14 +36,16 @@ namespace Restaurant.App.Others
             this.Close();
         }
 
+        // Lógica para encerrar uma conta.
         private void btnCloseBill_Click(object sender, EventArgs e)
         {
-            if (dgvTables.SelectedRows.Count == 0)
+            if (dgvTables.SelectedRows.Count == 0) // Nenhuma mesa selecionada na hora de fechar a conta
             {
                 MessageBox.Show("Selecione uma mesa para fechar a conta.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            // Recupera o ID e o número da mesa 
             int orderId = (int)dgvTables.SelectedRows[0].Cells["Id"].Value;
             int tableNum = (int)dgvTables.SelectedRows[0].Cells["Mesa"].Value;
 
@@ -49,9 +53,10 @@ namespace Restaurant.App.Others
             {
                 try
                 {
+                    // Marcar o pedido como pago e calcular o total final
                     _orderService.CloseBill(orderId);
                     MessageBox.Show($"Mesa {tableNum} fechada com sucesso!");
-                    CarregarMonitor();
+                    CarregarMonitor(); // Recarrega a tela 
                 }
                 catch (Exception ex)
                 {
@@ -60,12 +65,15 @@ namespace Restaurant.App.Others
             }
         }
 
+        // Método que ataualiza os dados na página
         private void CarregarMonitor()
         {
             try
             {
+                // Busca apenas as mesas ativas
                 _activeOrders = _orderService.GetOpenOrdersWithDetails<OrderViewModel>().ToList();
 
+                // Cria uma lista simplificada para exibir apenas as colunas necessárias na grade da esquerda.
                 var tablesDisplay = _activeOrders.Select(o => new
                 {
                     Id = o.Id,
@@ -74,8 +82,9 @@ namespace Restaurant.App.Others
                 }).OrderBy(x => x.Mesa).ToList();
 
                 dgvTables.DataSource = tablesDisplay;
-                if (dgvTables.Columns["Id"] != null) dgvTables.Columns["Id"].Visible = false;
+                if (dgvTables.Columns["Id"] != null) dgvTables.Columns["Id"].Visible = false; // Esconde o ID técnico do usuário.
 
+                // Seleciona automaticamente a primeira mesa da lista, se houver.
                 if (dgvTables.Rows.Count > 0)
                 {
                     dgvTables.Rows[0].Selected = true;
@@ -87,7 +96,8 @@ namespace Restaurant.App.Others
                     lblTotalValue.Text = "R$ 0,00";
                 }
 
-                decimal revenue = (decimal)_orderService.GetTotalRevenue(DateTime.Today); 
+                // Busca o faturamento acumulado do dia atual.
+                decimal revenue = (decimal)_orderService.GetTotalRevenue(DateTime.Today);
                 lblDailyRevenue.Text = $"Total do Dia: {revenue.ToString("C2")}";
             }
             catch (Exception ex)
@@ -105,6 +115,7 @@ namespace Restaurant.App.Others
             }
         }
 
+        // Preenche a grade da direita com os itens consumidos pela mesa 
         private void AtualizarDetalhes(int rowIndex)
         {
             if (rowIndex < 0 || rowIndex >= _activeOrders.Count) return;
@@ -132,7 +143,7 @@ namespace Restaurant.App.Others
                 }).ToList();
 
                 dgvDetails.DataSource = itemsDisplay;
-                lblTotalValue.Text = calculatedTotal.ToString("C2");
+                lblTotalValue.Text = calculatedTotal.ToString("C2"); // Formata como moeda (R$).
             }
         }
     }

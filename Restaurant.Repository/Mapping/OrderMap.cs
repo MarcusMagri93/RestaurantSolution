@@ -8,6 +8,7 @@ namespace Restaurant.Repository.Mapping
     {
         public void Configure(EntityTypeBuilder<Order> builder)
         {
+            //Primary Key
             builder.ToTable("Orders");
             builder.HasKey(o => o.Id);
 
@@ -17,7 +18,7 @@ namespace Restaurant.Repository.Mapping
                 .HasForeignKey(o => o.WaiterId)
                 .IsRequired();
 
-            // Relacionamento 1:N com OrderItem (Usando a coleção pública)
+            // Relacionamento 1:N com OrderItem 
             builder.HasMany(o => o.OrderItems)
                 .WithOne(oi => oi.Order)
                 .HasForeignKey(oi => oi.OrderId)

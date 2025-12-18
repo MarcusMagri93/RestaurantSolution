@@ -15,20 +15,20 @@ namespace Restaurant.App
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // 1. Configurar Serviços
+            // Configurar Serviços
             var services = new ServiceCollection();
             ConfigureServices(services);
 
-            // 2. Construir o Provedor de Serviços (Service Provider)
+            // Construir o Provedor de Serviços 
             var serviceProvider = services.BuildServiceProvider();
 
-            // 3. Obter o Formulário de Login (Transient)
+            // Obter o Formulário de Login 
             var loginForm = serviceProvider.GetRequiredService<LoginForm>();
 
-            // 4. Executar o Login
+            // Executar o Login
             if (loginForm.ShowDialog() == DialogResult.OK)
             {
-                // 5. Se o login for bem-sucedido, obter e rodar o MainForm (Singleton)
+                // Se o login for bem-sucedido, rodar MainForm
                 var mainForm = serviceProvider.GetRequiredService<MainForm>();
                 Application.Run(mainForm);
             }
@@ -36,14 +36,10 @@ namespace Restaurant.App
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            //Chamando o novo nome do método de extensão
             services.ConfigureApplicationServices();
 
-
-            // Singleton: O formulário principal (Menu)
             services.AddSingleton<MainForm>();
 
-            // Transient: Formulários de CRUD e Login
             services.AddTransient<LoginForm>();
             services.AddTransient<RegisterWaiterForm>();
             services.AddTransient<ProductForm>();

@@ -4,20 +4,21 @@
     {
         public int Volume { get; set; }
 
+        // CONSTRUTOR VAZIO -> EntiTy Framework "materialar os dados vindos do banco
         public Drink()
         {
         }
 
-        // Construtor para Criação
+        //  CONSTRUTOR 
         public Drink(string name, double price, int volume)
-            : base(name, price) // Chama o construtor de Product
+            : base(name, price)
         {
             Volume = volume;
         }
 
-        // Construtor Completo com Id
+        // CONSTRUTOR COMPLETO COM ID
         public Drink(int id, string name, double price, int volume)
-            : base(id, name, price) // Chama o construtor de Product com Id
+            : base(id, name, price)
         {
             Volume = volume;
         }
