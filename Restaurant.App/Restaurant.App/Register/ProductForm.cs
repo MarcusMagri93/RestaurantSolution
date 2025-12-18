@@ -28,11 +28,21 @@ namespace Restaurant.App.Register
             _foodService = foodService;
             _drinkService = drinkService;
 
-            UpdateVisibility(); 
+            UpdateVisibility();
+        }
+
+        // MÉTODO QUE RESOLVE O PROBLEMA DA ABA INICIAL
+        // Aplica o índice definido pelo MainForm ao carregar a tela
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            if (TabIndexInicial > 0 && TabIndexInicial < tabControlCadastro.TabCount)
+            {
+                tabControlCadastro.SelectedIndex = TabIndexInicial;
+            }
         }
 
         // LÓGICA DE INTERFACE DINÂMICA
-        // Esconde ou mostra campos dependendo se é Comida ou Bebida
         private void UpdateVisibility()
         {
             bool isFood = radFood.Checked;
@@ -46,6 +56,12 @@ namespace Restaurant.App.Register
             // Campo específico de Bebida (Volume)
             lblVolume.Visible = !isFood;
             txtVolume.Visible = !isFood;
+        }
+
+        // Método para responder à mudança de seleção entre Comida e Bebida
+        private void Type_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateVisibility();
         }
 
         protected override void CarregaGrid()
@@ -75,8 +91,6 @@ namespace Restaurant.App.Register
                     return;
                 }
 
-                // POLIMORFISMO NA PRÁTICA
-                // Se Food estiver marcado, usamos o _foodService
                 if (radFood.Checked)
                 {
                     var food = new Food
@@ -97,7 +111,6 @@ namespace Restaurant.App.Register
                         _foodService.Add<Food, ProductViewModel, FoodValidator>(food);
                     }
                 }
-                // Se não, usamos o _drinkService
                 else
                 {
                     var drink = new Drink
@@ -124,7 +137,6 @@ namespace Restaurant.App.Register
             }
             catch (ValidationException vex)
             {
-                // Erros de validação (preço negativo)
                 var errors = string.Join("\n", vex.Errors);
                 MessageBox.Show(errors, "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -150,8 +162,6 @@ namespace Restaurant.App.Register
             }
             catch (Exception ex)
             {
-                // INTEGRIDADE REFERENCIAL:
-                // Se o produto já foi vendido o banco impede a exclusão.
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE statement conflicted"))
                 {
                     MessageBox.Show("Não é possível excluir este produto pois ele já foi vendido em pedidos anteriores.", "Bloqueio de Exclusão", MessageBoxButtons.OK, MessageBoxIcon.Warning);

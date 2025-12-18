@@ -1,6 +1,7 @@
 ﻿using System.Windows.Forms;
 using ReaLTaiizor.Controls;
 
+
 namespace Restaurant.App.Register
 {
     partial class ProductForm
